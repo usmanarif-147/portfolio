@@ -6,10 +6,10 @@
         <div class="flex justify-between h-16">
           <div class="flex items-center">
             <span class="text-xl font-bold text-indigo-600">{{ resumeStore.data.profile[0]?.full_name || 'My Portfolio'
-            }}</span>
+              }}</span>
           </div>
           <div class="hidden md:flex space-x-8 items-center">
-            <a href="#about" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium">About Me</a>
+            <a href="#about" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium">About</a>
             <a href="#experience"
               class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium">Experience</a>
             <a href="#education" class="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium">Education</a>
@@ -135,7 +135,7 @@
               </div>
               <div class="text-gray-600 mt-2 md:mt-0">
                 <span>{{ formatDate(exp.start_date) }} - {{ exp.is_current ? 'Present' : formatDate(exp.end_date)
-                }}</span>
+                  }}</span>
                 <p>{{ exp.location }}</p>
               </div>
             </div>
