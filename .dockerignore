@@ -1,0 +1,11 @@
+vendor/
+node_modules/
+storage/
+.git
+.gitignore
+docker-compose.yml
+Dockerfile
+docker/
+.idea/
+.vscode/
+*.md

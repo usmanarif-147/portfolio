@@ -1,0 +1,217 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\Blog\BlogPost;
+use App\Models\Blog\BlogPostTag;
+use App\Models\Category;
+use App\Models\Education;
+use App\Models\Experience\Experience;
+use App\Models\Experience\ExperienceResponsibility;
+use App\Models\Profile;
+use App\Models\Project\Project;
+use App\Models\Skill\Skill;
+use App\Models\Strength;
+use App\Models\User;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
+
+class DatabaseSeeder extends Seeder
+{
+    use WithoutModelEvents;
+
+    /**
+     * Seed the application's database.
+     */
+    public function run(): void
+    {
+        $user = User::factory()->create([
+            'name' => 'Usman Arif',
+            'email' => 'usmanarif.9219@gmail.com',
+            'password' => '11223344',
+        ]);
+
+        // Profile
+        Profile::create([
+            'user_id' => $user->id,
+            'tagline' => 'Full-Stack Developer',
+            'bio' => "I'm a dedicated Full-Stack Developer with 4+ years of professional experience in building robust web applications. My expertise lies in the Laravel ecosystem, where I leverage tools like Livewire, Filament, and Tailwind CSS to create seamless user experiences.\n\nI thrive on transforming complex business requirements into elegant, maintainable code. Whether it's architecting a new system from scratch or optimizing an existing application, I bring a problem-solving mindset and attention to detail.",
+            'secondary_email' => 'usman@example.com',
+            'location' => 'Lahore, Pakistan',
+            'availability_status' => 'Open to opportunities',
+        ]);
+
+        // Categories (used by Skills only — Strengths have no category)
+        $categoryMap = [];
+        foreach ([
+            ['name' => 'Frontend', 'sort_order' => 0],
+            ['name' => 'Backend', 'sort_order' => 1],
+            ['name' => 'Database & Tools', 'sort_order' => 2],
+        ] as $cat) {
+            $category = Category::create($cat + ['slug' => Str::slug($cat['name'])]);
+            $categoryMap[$category->name] = $category->id;
+        }
+
+        // Strengths (soft attributes shown in About Me).
+        // Note: welcome.blade.php wraps {{ $skill->icon }} inside <path d="..."/>,
+        // so the icon column must hold just the SVG path data (the "M..." string).
+        $strengths = [
+            ['title' => 'Problem Solving', 'icon' => 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z', 'sort_order' => 0],
+            ['title' => 'Creativity', 'icon' => 'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01', 'sort_order' => 1],
+            ['title' => 'Adaptability', 'icon' => 'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15', 'sort_order' => 2],
+            ['title' => 'Optimization', 'icon' => 'M13 10V3L4 14h7v7l9-11h-7z', 'sort_order' => 3],
+        ];
+
+        foreach ($strengths as $strength) {
+            Strength::create($strength);
+        }
+
+        // Skills (technical — grouped by Category in the Skills & Tech section)
+        $skills = [
+            ['title' => 'HTML5', 'category' => 'Frontend', 'sort_order' => 0],
+            ['title' => 'CSS3', 'category' => 'Frontend', 'sort_order' => 1],
+            ['title' => 'JavaScript', 'category' => 'Frontend', 'sort_order' => 2],
+            ['title' => 'Alpine.js', 'category' => 'Frontend', 'sort_order' => 3],
+            ['title' => 'Livewire', 'category' => 'Frontend', 'sort_order' => 4],
+            ['title' => 'Tailwind CSS', 'category' => 'Frontend', 'sort_order' => 5],
+            ['title' => 'Bootstrap', 'category' => 'Frontend', 'sort_order' => 6],
+            ['title' => 'jQuery', 'category' => 'Frontend', 'sort_order' => 7],
+            ['title' => 'PHP', 'category' => 'Backend', 'sort_order' => 0],
+            ['title' => 'Laravel', 'category' => 'Backend', 'sort_order' => 1],
+            ['title' => 'Filament', 'category' => 'Backend', 'sort_order' => 2],
+            ['title' => 'REST APIs', 'category' => 'Backend', 'sort_order' => 3],
+            ['title' => 'Python', 'category' => 'Backend', 'sort_order' => 4],
+            ['title' => 'Node.js', 'category' => 'Backend', 'sort_order' => 5],
+            ['title' => 'MySQL', 'category' => 'Database & Tools', 'sort_order' => 0],
+            ['title' => 'PostgreSQL', 'category' => 'Database & Tools', 'sort_order' => 1],
+            ['title' => 'Redis', 'category' => 'Database & Tools', 'sort_order' => 2],
+            ['title' => 'Git', 'category' => 'Database & Tools', 'sort_order' => 3],
+            ['title' => 'Docker', 'category' => 'Database & Tools', 'sort_order' => 4],
+            ['title' => 'Linux', 'category' => 'Database & Tools', 'sort_order' => 5],
+            ['title' => 'AWS', 'category' => 'Database & Tools', 'sort_order' => 6],
+            ['title' => 'CI/CD', 'category' => 'Database & Tools', 'sort_order' => 7],
+        ];
+
+        foreach ($skills as $skill) {
+            Skill::create([
+                'title' => $skill['title'],
+                'category_id' => $categoryMap[$skill['category']],
+                'sort_order' => $skill['sort_order'],
+            ]);
+        }
+
+        // Experiences
+        $horizam = Experience::create([
+            'role' => 'Full-Stack Developer',
+            'company' => 'Horizam',
+            'start_date' => '2022-01-01',
+            'end_date' => null,
+            'is_current' => true,
+            'sort_order' => 0,
+        ]);
+
+        foreach ([
+            'Built and maintained multiple Laravel web applications with Livewire and Filament admin panels',
+            'Implemented REST APIs, payment integrations, and third-party service integrations',
+            'Optimized database queries and application performance for large-scale systems',
+        ] as $i => $desc) {
+            ExperienceResponsibility::create([
+                'experience_id' => $horizam->id,
+                'description' => $desc,
+                'sort_order' => $i,
+            ]);
+        }
+
+        $softenica = Experience::create([
+            'role' => 'Software Developer',
+            'company' => 'Softenica',
+            'start_date' => '2021-01-01',
+            'end_date' => '2022-01-01',
+            'is_current' => false,
+            'sort_order' => 1,
+        ]);
+
+        foreach ([
+            'Developed web applications using Laravel and Vue.js',
+            'Collaborated with cross-functional teams to deliver client projects on schedule',
+            'Participated in code reviews and implemented best practices for code quality',
+        ] as $i => $desc) {
+            ExperienceResponsibility::create([
+                'experience_id' => $softenica->id,
+                'description' => $desc,
+                'sort_order' => $i,
+            ]);
+        }
+
+        // Education
+        Education::create([
+            'degree_title' => 'B.S. Software Engineering',
+            'institution' => 'University of Management and Technology (UMT)',
+            'start_date' => '2016-09-01',
+            'end_date' => '2021-06-01',
+            'sort_order' => 0,
+        ]);
+
+        // Projects
+        $project1 = Project::create([
+            'title' => 'Autotheory',
+            'slug' => 'autotheory',
+            'short_description' => 'A comprehensive automotive theory learning platform with interactive quizzes, progress tracking, and adaptive learning paths.',
+            'description' => 'Built to help users prepare for driving theory exams efficiently. Features include mock tests, progress analytics, and spaced repetition.',
+            'tech_stack' => ['Laravel', 'Livewire', 'Tailwind CSS', 'MySQL'],
+            'is_featured' => true,
+            'sort_order' => 0,
+            'completed_at' => '2024-06-15',
+        ]);
+
+        $project2 = Project::create([
+            'title' => 'Workforce & Job Management System',
+            'slug' => 'workforce-job-management',
+            'short_description' => 'An enterprise workforce management platform for scheduling, job tracking, employee management, and reporting.',
+            'description' => 'Features real-time dashboards, automated notifications, role-based access control, and comprehensive reporting.',
+            'tech_stack' => ['Laravel', 'Filament', 'Alpine.js', 'REST API'],
+            'is_featured' => true,
+            'sort_order' => 1,
+            'completed_at' => '2024-01-20',
+        ]);
+
+        $project3 = Project::create([
+            'title' => 'E-Commerce Analytics Dashboard',
+            'slug' => 'ecommerce-analytics',
+            'short_description' => 'Real-time analytics dashboard for e-commerce businesses with sales tracking, inventory management, and customer insights.',
+            'description' => 'A data-driven dashboard providing actionable insights for online stores.',
+            'tech_stack' => ['Laravel', 'Livewire', 'Chart.js', 'PostgreSQL', 'Redis'],
+            'is_featured' => false,
+            'sort_order' => 2,
+            'completed_at' => '2023-08-10',
+        ]);
+
+        // Blog Posts
+        $post1 = BlogPost::create([
+            'title' => 'Building Scalable Laravel Applications with Livewire',
+            'slug' => 'building-scalable-laravel-applications-with-livewire',
+            'excerpt' => 'Learn how to architect Laravel applications that scale gracefully using Livewire components and best practices.',
+            'content' => '<p>Laravel and Livewire together form a powerful combination for building modern web applications without the complexity of a separate frontend framework.</p><p>In this article, we explore patterns for building scalable, maintainable Livewire applications.</p>',
+            'status' => 'published',
+            'published_at' => '2024-02-15 10:00:00',
+            'reading_time_minutes' => 8,
+        ]);
+
+        BlogPostTag::create(['blog_post_id' => $post1->id, 'tag' => 'Laravel']);
+        BlogPostTag::create(['blog_post_id' => $post1->id, 'tag' => 'Livewire']);
+
+        $post2 = BlogPost::create([
+            'title' => 'Optimizing Database Queries in Large-Scale Applications',
+            'slug' => 'optimizing-database-queries-large-scale',
+            'excerpt' => 'Practical tips for identifying and fixing N+1 queries, using eager loading, and leveraging database indexes.',
+            'content' => '<p>Performance optimization is crucial for applications handling thousands of users. This guide covers the most impactful database optimizations you can make in Laravel.</p>',
+            'status' => 'published',
+            'published_at' => '2024-01-10 14:00:00',
+            'reading_time_minutes' => 6,
+        ]);
+
+        BlogPostTag::create(['blog_post_id' => $post2->id, 'tag' => 'Performance']);
+        BlogPostTag::create(['blog_post_id' => $post2->id, 'tag' => 'Database']);
+    }
+}
