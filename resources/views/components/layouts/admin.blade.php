@@ -54,10 +54,8 @@
                     request()->routeIs('admin.educations.*') ||
                     request()->routeIs('admin.categories.*') ||
                     request()->routeIs('admin.skills.*') ||
-                    request()->routeIs('admin.strengths.*') ||
                     request()->routeIs('admin.experiences.*') ||
                     request()->routeIs('admin.projects.*') ||
-                    request()->routeIs('admin.analytics') ||
                     request()->routeIs('admin.resume-builder');
             @endphp
             <div x-data="{ portfolioOpen: {{ $portfolioActive ? 'true' : 'false' }} }">
@@ -117,15 +115,6 @@
                         Skills
                     </a>
 
-                    <a href="{{ route('admin.strengths.index') }}"
-                        class="flex items-center gap-3 pl-10 pr-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('admin.strengths.*') ? 'bg-primary/10 text-primary-light' : 'text-gray-400 hover:text-white hover:bg-dark-700' }} transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
-                        Strengths
-                    </a>
-
                     <a href="{{ route('admin.experiences.index') }}"
                         class="flex items-center gap-3 pl-10 pr-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('admin.experiences.*') ? 'bg-primary/10 text-primary-light' : 'text-gray-400 hover:text-white hover:bg-dark-700' }} transition-colors">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -142,15 +131,6 @@
                                 d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                         </svg>
                         Projects
-                    </a>
-
-                    <a href="{{ route('admin.analytics') }}"
-                        class="flex items-center gap-3 pl-10 pr-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs('admin.analytics') ? 'bg-primary/10 text-primary-light' : 'text-gray-400 hover:text-white hover:bg-dark-700' }} transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                        </svg>
-                        Analytics
                     </a>
 
                     <a href="{{ route('admin.resume-builder') }}"

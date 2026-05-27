@@ -8,7 +8,6 @@ use App\Models\Experience\Experience;
 use App\Models\Profile;
 use App\Models\Project\Project;
 use App\Models\Skill\Skill;
-use App\Models\Strength;
 use App\Models\User;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -61,13 +60,6 @@ class AiChatbotService
 
                     return "- {$skill->title}{$proficiency}";
                 })->implode("\n");
-                $context .= "\n";
-            }
-
-            $strengths = Strength::query()->active()->ordered()->get();
-            if ($strengths->isNotEmpty()) {
-                $context .= "\n=== STRENGTHS ===\n";
-                $context .= $strengths->map(fn ($s) => "- {$s->title}")->implode("\n");
                 $context .= "\n";
             }
 

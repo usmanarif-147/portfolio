@@ -10,7 +10,7 @@ class CategorySeeder extends Seeder
 {
     public function run(): void
     {
-        // Categories (used by Skills only — Strengths have no category)
+        // Categories (used to group Skills in the Skills & Tech section)
         foreach ([
             ['name' => 'Frontend', 'sort_order' => 0],
             ['name' => 'Backend', 'sort_order' => 1],

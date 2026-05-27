@@ -23,9 +23,6 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->redirectGuestsTo('/admin/login');
         $middleware->redirectUsersTo('/admin/dashboard');
-        $middleware->web(append: [
-            \App\Http\Middleware\TrackVisitor::class,
-        ]);
     })
     ->withSchedule(function (\Illuminate\Console\Scheduling\Schedule $schedule): void {
         $schedule->command('social:publish-due')->everyFifteenMinutes()->withoutOverlapping();

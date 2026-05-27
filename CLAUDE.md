@@ -68,11 +68,9 @@ portfolio/
 │
 ├── app/
 │   ├── Http/
-│   │   ├── Controllers/
-│   │   │   ├── PortfolioController.php       ← [PUBLIC] index() fetches ALL data, passes to welcome.blade.php
-│   │   │   └── ResumeController.php          ← [PUBLIC] resume PDF download
-│   │   └── Middleware/
-│   │       └── TrackVisitor.php              ← [PUBLIC] logs visitor on every public page load
+│   │   └── Controllers/
+│   │       ├── PortfolioController.php       ← [PUBLIC] index() fetches ALL data, passes to welcome.blade.php
+│   │       └── ResumeController.php          ← [PUBLIC] resume PDF download
 │   │
 │   ├── Livewire/
 │   │   └── ContactForm.php                   ← [PUBLIC] ONLY Livewire component on public side
@@ -86,7 +84,6 @@ portfolio/
 │   │   │   └── ExperienceResponsibility.php  ← responsibilities listed under each experience
 │   │   ├── Project/
 │   │   │   └── Project.php                   ← projects grid section (featured + all)
-│   │   ├── PortfolioVisitor.php              ← visitor tracking records
 │   │   ├── Profile.php                       ← hero section: tagline, bio, photo, social links
 │   │   ├── ResumeDownload.php                ← resume download count tracking
 │   │   ├── Skill.php                         ← about section: skill cards with proficiency
@@ -95,7 +92,6 @@ portfolio/
 │   │   └── User.php                          ← name used in hero heading + footer copyright
 │   │
 │   └── Services/                             ← [SHARED] used by both public controllers and admin components
-│       ├── AnalyticsService.php
 │       ├── BlogPostService.php
 │       ├── ExperienceService.php
 │       ├── ProjectService.php
@@ -129,7 +125,6 @@ portfolio/
 │   ├── Livewire/
 │   │   └── Admin/                            ← [ADMIN] ALL admin Livewire components
 │   │       ├── Portfolio/                    ← Portfolio module group
-│   │       │   ├── Analytics.php             ← portfolio analytics dashboard
 │   │       │   ├── Blog/
 │   │       │   │   ├── BlogPostForm.php
 │   │       │   │   └── BlogPostIndex.php
@@ -171,7 +166,6 @@ portfolio/
 │       │   ├── Project.php
 │       │   └── ProjectImage.php
 │       ├── File.php                          ← single model — no subfolder needed
-│       ├── PortfolioVisitor.php
 │       ├── Profile.php
 │       ├── ResumeDownload.php
 │       ├── Skill.php
@@ -190,7 +184,6 @@ portfolio/
 │   └── livewire/
 │       └── admin/                            ← [ADMIN] views — mirrors Livewire/Admin/ exactly
 │           ├── portfolio/                    ← mirrors Livewire/Admin/Portfolio/
-│           │   ├── analytics.blade.php
 │           │   ├── blog/
 │           │   │   ├── form.blade.php
 │           │   │   └── index.blade.php
@@ -225,7 +218,6 @@ portfolio/
     ├── web.php (admin section)               ← login, logout, dashboard, profile, file-manager
     └── admin/
         ├── portfolio/                        ← Portfolio module routes
-        │   ├── analytics.php
         │   ├── blog.php
         │   ├── experiences.php
         │   ├── projects.php
@@ -329,20 +321,19 @@ Portfolio (parent, collapsible)
   ├── Experiences
   ├── Projects
   ├── Testimonials
-  ├── Blog
-  └── Analytics        ← nested inside Portfolio, not standalone
+  └── Blog             ← every feature nested inside its parent module group
 
 ❌ Wrong:
-Portfolio (parent)
-  ├── Skills
+Some Module (parent)
+  ├── Feature A
   └── ...
-Analytics              ← standalone at root level — NEVER do this
+Feature B              ← standalone at root level — NEVER do this
 
 ### Analytics Belongs to Its Module
-Each module that has analytics MUST have its analytics link nested inside that module's sidebar group — not at root level and not in a generic "Analytics" section.
+If a module has analytics, its analytics link MUST be nested inside that module's sidebar group — not at root level and not in a generic "Analytics" section.
 
 Some modules have analytics, some do not:
-- Portfolio → has Analytics ✅
+- Portfolio → no analytics
 - Tasks → may have Analytics (nest under Tasks if so)
 - Job Search → may have Analytics (nest under Job Search if so)
 - A module with no analytics → simply has no analytics link

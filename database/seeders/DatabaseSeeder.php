@@ -20,7 +20,6 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             ProfileSeeder::class,
             // CategorySeeder::class,
-            // StrengthSeeder::class,
             // SkillSeeder::class,
             // ExperienceSeeder::class,
             // EducationSeeder::class,
