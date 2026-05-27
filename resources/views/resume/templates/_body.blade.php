@@ -56,7 +56,13 @@
                 ], fn ($v) => trim((string) $v) !== ''));
             @endphp
             @if (count($contactParts) > 0)
-                <div class="contact">{{ implode('  |  ', $contactParts) }}</div>
+                @php
+                    $contactHtml = implode(
+                        '&nbsp;&nbsp;|&nbsp;&nbsp;',
+                        array_map(fn ($p) => e($p), $contactParts)
+                    );
+                @endphp
+                <div class="contact">{!! $contactHtml !!}</div>
             @endif
         @elseif ($interactive)
             <div class="empty-hint">Header — click + to add your name, tagline, location, phone, email, LinkedIn, and GitHub.</div>

@@ -97,6 +97,7 @@
     }
     .resume-paper .job .company {
         display: table-cell;
+        width: 100%;
         font-size: 9px;
         font-weight: 700;
         color: #111827;
@@ -143,6 +144,7 @@
     }
     .resume-paper .project .title {
         display: table-cell;
+        width: 100%;
         font-size: 9px;
         font-weight: 700;
         color: #111827;
@@ -196,6 +198,7 @@
     }
     .resume-paper .education-entry .degree {
         display: table-cell;
+        width: 100%;
         font-size: 9px;
         font-weight: 700;
         color: #111827;
