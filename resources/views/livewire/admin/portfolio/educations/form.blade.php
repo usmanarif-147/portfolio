@@ -12,45 +12,55 @@
         <p class="text-gray-500 mt-1">{{ $education ? 'Update education details.' : 'Add a new education entry.' }}</p>
     </div>
 
-    <form wire:submit="save" class="max-w-2xl">
-        <div class="bg-dark-800 border border-dark-700 rounded-xl p-6 space-y-5">
-            <div>
-                <label for="degree_title" class="block text-sm font-medium text-gray-300 mb-1.5">Degree Title <span class="text-red-400">*</span></label>
-                <input type="text" id="degree_title" wire:model="degree_title"
-                       class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent"
-                       placeholder="e.g. Bachelor of Science in Computer Science">
-                @error('degree_title') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
-            </div>
+    <form wire:submit="save">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {{-- Main --}}
+            <div class="lg:col-span-2 space-y-6">
+                <div class="bg-dark-800 border border-dark-700 rounded-xl p-6 space-y-5">
+                    <h2 class="text-lg font-mono font-semibold text-white uppercase tracking-wider">Education Details</h2>
+                    <div>
+                        <label for="degree_title" class="block text-sm font-medium text-gray-300 mb-1.5">Degree Title <span class="text-red-400">*</span></label>
+                        <input type="text" id="degree_title" wire:model="degree_title"
+                               class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent"
+                               placeholder="e.g. Bachelor of Science in Computer Science">
+                        @error('degree_title') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+                    </div>
 
-            <div>
-                <label for="institution" class="block text-sm font-medium text-gray-300 mb-1.5">Institution <span class="text-red-400">*</span></label>
-                <input type="text" id="institution" wire:model="institution"
-                       class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent"
-                       placeholder="e.g. MIT">
-                @error('institution') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div>
-                    <label for="start_date" class="block text-sm font-medium text-gray-300 mb-1.5">Start Date</label>
-                    <input type="date" id="start_date" wire:model="start_date"
-                           class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-primary focus:border-transparent">
-                    @error('start_date') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
-                </div>
-
-                <div>
-                    <label for="end_date" class="block text-sm font-medium text-gray-300 mb-1.5">End Date</label>
-                    <input type="date" id="end_date" wire:model="end_date"
-                           class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-primary focus:border-transparent">
-                    @error('end_date') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+                    <div>
+                        <label for="institution" class="block text-sm font-medium text-gray-300 mb-1.5">Institution <span class="text-red-400">*</span></label>
+                        <input type="text" id="institution" wire:model="institution"
+                               class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent"
+                               placeholder="e.g. MIT">
+                        @error('institution') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+                    </div>
                 </div>
             </div>
 
-            <div>
-                <label for="sort_order" class="block text-sm font-medium text-gray-300 mb-1.5">Sort Order</label>
-                <input type="number" id="sort_order" wire:model="sort_order" min="0"
-                       class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent">
-                @error('sort_order') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+            {{-- Sidebar --}}
+            <div class="space-y-6">
+                <div class="bg-dark-800 border border-dark-700 rounded-xl p-6 space-y-5">
+                    <h2 class="text-lg font-mono font-semibold text-white uppercase tracking-wider">Timeline</h2>
+                    <div>
+                        <label for="start_date" class="block text-sm font-medium text-gray-300 mb-1.5">Start Date</label>
+                        <input type="date" id="start_date" wire:model="start_date"
+                               class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-primary focus:border-transparent">
+                        @error('start_date') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label for="end_date" class="block text-sm font-medium text-gray-300 mb-1.5">End Date</label>
+                        <input type="date" id="end_date" wire:model="end_date"
+                               class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-primary focus:border-transparent">
+                        @error('end_date') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label for="sort_order" class="block text-sm font-medium text-gray-300 mb-1.5">Sort Order</label>
+                        <input type="number" id="sort_order" wire:model="sort_order" min="0"
+                               class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent">
+                        @error('sort_order') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+                    </div>
+                </div>
             </div>
         </div>
 

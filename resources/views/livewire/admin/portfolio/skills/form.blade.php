@@ -12,55 +12,65 @@
         <p class="text-gray-500 mt-1">{{ $skill ? 'Update skill details.' : 'Add a new skill to your portfolio.' }}</p>
     </div>
 
-    <form wire:submit="save" class="max-w-2xl">
-        <div class="bg-dark-800 border border-dark-700 rounded-xl p-6 space-y-5">
-            <div>
-                <label for="title" class="block text-sm font-medium text-gray-300 mb-1.5">Title <span class="text-red-400">*</span></label>
-                <input type="text" id="title" wire:model="title"
-                       class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent"
-                       placeholder="e.g. Laravel">
-                @error('title') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
-            </div>
-
-            {{-- Category --}}
-            <div>
-                <label for="category_id" class="block text-sm font-medium text-gray-300 mb-2">Category <span class="text-red-400">*</span></label>
-                @if ($categories->isEmpty())
-                    <div class="bg-amber-500/10 border border-amber-500/30 text-amber-300 rounded-lg px-4 py-3 text-sm">
-                        No categories yet.
-                        <a href="{{ route('admin.categories.create') }}" wire:navigate class="underline hover:text-amber-200">Create one first</a>
-                        before adding skills.
+    <form wire:submit="save">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {{-- Main --}}
+            <div class="lg:col-span-2 space-y-6">
+                <div class="bg-dark-800 border border-dark-700 rounded-xl p-6 space-y-5">
+                    <h2 class="text-lg font-mono font-semibold text-white uppercase tracking-wider">Skill Details</h2>
+                    <div>
+                        <label for="title" class="block text-sm font-medium text-gray-300 mb-1.5">Title <span class="text-red-400">*</span></label>
+                        <input type="text" id="title" wire:model="title"
+                               class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent"
+                               placeholder="e.g. Laravel">
+                        @error('title') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
                     </div>
-                @else
-                    <select id="category_id" wire:model="category_id"
-                            class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors">
-                        <option value="">— Select a category —</option>
-                        @foreach ($categories as $cat)
-                            <option value="{{ $cat->id }}">{{ $cat->name }}</option>
-                        @endforeach
-                    </select>
-                    <p class="mt-1 text-xs text-gray-500">
-                        Need a new category?
-                        <a href="{{ route('admin.categories.index') }}" wire:navigate class="text-primary-light hover:underline">Manage categories</a>.
-                    </p>
-                @endif
-                @error('category_id') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+
+                    {{-- Category --}}
+                    <div>
+                        <label for="category_id" class="block text-sm font-medium text-gray-300 mb-2">Category <span class="text-red-400">*</span></label>
+                        @if ($categories->isEmpty())
+                            <div class="bg-amber-500/10 border border-amber-500/30 text-amber-300 rounded-lg px-4 py-3 text-sm">
+                                No categories yet.
+                                <a href="{{ route('admin.categories.create') }}" wire:navigate class="underline hover:text-amber-200">Create one first</a>
+                                before adding skills.
+                            </div>
+                        @else
+                            <select id="category_id" wire:model="category_id"
+                                    class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors">
+                                <option value="">— Select a category —</option>
+                                @foreach ($categories as $cat)
+                                    <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                                @endforeach
+                            </select>
+                            <p class="mt-1 text-xs text-gray-500">
+                                Need a new category?
+                                <a href="{{ route('admin.categories.index') }}" wire:navigate class="text-primary-light hover:underline">Manage categories</a>.
+                            </p>
+                        @endif
+                        @error('category_id') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+                    </div>
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div>
-                    <label for="sort_order" class="block text-sm font-medium text-gray-300 mb-1.5">Sort Order</label>
-                    <input type="number" id="sort_order" wire:model="sort_order" min="0"
-                           class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent">
-                    @error('sort_order') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
-                </div>
+            {{-- Sidebar --}}
+            <div class="space-y-6">
+                <div class="bg-dark-800 border border-dark-700 rounded-xl p-6 space-y-5">
+                    <h2 class="text-lg font-mono font-semibold text-white uppercase tracking-wider">Settings</h2>
+                    <div>
+                        <label for="sort_order" class="block text-sm font-medium text-gray-300 mb-1.5">Sort Order</label>
+                        <input type="number" id="sort_order" wire:model="sort_order" min="0"
+                               class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent">
+                        @error('sort_order') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+                    </div>
 
-                <div class="flex items-center pt-6">
-                    <label class="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" wire:model="is_active" class="sr-only peer">
-                        <div class="w-11 h-6 bg-dark-600 peer-focus:ring-2 peer-focus:ring-primary rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
-                        <span class="ml-3 text-sm font-medium text-gray-400">Active</span>
-                    </label>
+                    <div class="flex items-center">
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" wire:model="is_active" class="sr-only peer">
+                            <div class="w-11 h-6 bg-dark-600 peer-focus:ring-2 peer-focus:ring-primary rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            <span class="ml-3 text-sm font-medium text-gray-400">Active</span>
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>
