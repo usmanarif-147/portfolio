@@ -1,16 +1,17 @@
 <style>
     /* ============================================================
        RESUME PAPER — shared by on-screen preview AND PDF.
-       Edit this block to change the resume's appearance everywhere.
+       Single-column layout. Per-element font sizes are applied by
+       _format_overrides.blade.php (included after this file).
        ============================================================ */
     .resume-paper {
         background: #ffffff;
         color: #1f2937;
         font-family: Helvetica, Arial, sans-serif;
-        font-size: 10.5px;
+        font-size: 9px;
         line-height: 1.45;
         width: 210mm;
-        height: 297mm;
+        min-height: 297mm;
         padding: 14mm 16mm;
         margin: 0 auto;
         box-sizing: border-box;
@@ -20,63 +21,34 @@
     /* ---- Header ---- */
     .resume-paper .resume-header {
         border-bottom: 2px solid #d1d5db;
-        padding-bottom: 14px;
-        margin-bottom: 16px;
+        padding-bottom: 12px;
+        margin-bottom: 14px;
         position: relative;
     }
     .resume-paper .resume-header h1 {
-        font-size: 30px;
+        font-size: 22px;
         font-weight: 700;
         color: #1d4ed8;
         letter-spacing: 0.5px;
-        margin: 0 0 4px 0;
+        margin: 0 0 3px 0;
     }
     .resume-paper .resume-header .tagline {
-        font-size: 11px;
+        font-size: 10px;
         font-weight: 700;
         color: #374151;
         text-transform: uppercase;
-        letter-spacing: 1.4px;
-        margin-bottom: 10px;
+        letter-spacing: 1.2px;
+        margin-bottom: 7px;
     }
     .resume-paper .resume-header .contact {
-        font-size: 10px;
+        font-size: 9px;
         color: #4b5563;
-    }
-    .resume-paper .resume-header .contact > span {
-        margin-right: 16px;
-    }
-    /* Icon/symbol glyphs (contact icons, strength stars) — rendered from DejaVu Sans,
-       which is bundled in DomPDF and contains these glyphs. Core fonts (Helvetica) and
-       Carlito lack them, so without this they'd vanish in the PDF. In the browser DejaVu
-       isn't installed → falls back to sans-serif → the OS supplies the glyph (unchanged). */
-    .resume-paper .ico {
-        font-family: 'DejaVu Sans', sans-serif;
-        font-style: normal;
     }
     .resume-paper .empty-hint {
         color: #9ca3af;
         font-size: 10px;
         font-style: italic;
         padding: 6px 0;
-    }
-
-    /* ---- Two-column body (table — only layout DomPDF reliably renders side-by-side) ---- */
-    .resume-paper table.resume-body {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    .resume-paper table.resume-body > tbody > tr > td {
-        vertical-align: top;
-    }
-    .resume-paper td.col-left {
-        width: 60%;
-        padding-right: 18px;
-    }
-    .resume-paper td.col-right {
-        width: 40%;
-        padding-left: 18px;
-        border-left: 1px solid #e5e7eb;
     }
 
     /* ---- Section heading ---- */
@@ -108,17 +80,16 @@
         width: 30px;
     }
 
-    /* ---- Profile ---- */
-    .resume-paper .profile p {
-        font-size: 10.5px;
+    /* ---- Professional summary ---- */
+    .resume-paper .summary {
+        font-size: 9px;
         color: #374151;
-        line-height: 1.6;
         margin: 0;
     }
 
     /* ---- Work experience ---- */
     .resume-paper .job {
-        margin-bottom: 8px;
+        margin-bottom: 9px;
     }
     .resume-paper .job .job-head {
         display: table;
@@ -126,22 +97,22 @@
     }
     .resume-paper .job .company {
         display: table-cell;
-        font-size: 11px;
+        font-size: 9px;
         font-weight: 700;
         color: #111827;
     }
     .resume-paper .job .dates {
         display: table-cell;
         text-align: right;
-        font-size: 9.5px;
+        font-size: 9px;
         color: #6b7280;
         font-style: italic;
         white-space: nowrap;
     }
     .resume-paper .job .role {
-        font-size: 10px;
-        color: #1d4ed8;
-        font-weight: 600;
+        font-size: 9px;
+        color: #4b5563;
+        font-style: italic;
         margin: 1px 0 4px 0;
     }
     .resume-paper ul.bullets {
@@ -150,7 +121,7 @@
         margin: 0;
     }
     .resume-paper ul.bullets li {
-        font-size: 10px;
+        font-size: 9px;
         color: #374151;
         margin-bottom: 2px;
         padding-left: 11px;
@@ -164,23 +135,34 @@
 
     /* ---- Projects ---- */
     .resume-paper .project {
-        margin-bottom: 8px;
+        margin-bottom: 9px;
+    }
+    .resume-paper .project .project-head {
+        display: table;
+        width: 100%;
     }
     .resume-paper .project .title {
-        font-size: 11px;
+        display: table-cell;
+        font-size: 9px;
         font-weight: 700;
         color: #111827;
     }
-    .resume-paper .project .subtitle {
-        font-size: 9.5px;
-        color: #6b7280;
-        font-style: italic;
-        margin-bottom: 3px;
+    .resume-paper .project .url {
+        display: table-cell;
+        text-align: right;
+        font-size: 9px;
+        color: #1d4ed8;
+        white-space: nowrap;
+    }
+    .resume-paper .project .desc {
+        font-size: 9px;
+        color: #374151;
+        margin: 2px 0 0 0;
     }
     .resume-paper .project .tech {
-        font-size: 9.5px;
+        font-size: 9px;
         color: #374151;
-        margin-top: 3px;
+        margin-top: 2px;
     }
     .resume-paper .project .tech strong {
         font-weight: 700;
@@ -189,79 +171,45 @@
         font-style: italic;
     }
 
-    /* ---- Skills ---- */
+    /* ---- Skills (inline, comma-separated) ---- */
     .resume-paper .skill-group {
-        margin-bottom: 8px;
+        font-size: 9px;
+        color: #374151;
+        margin-bottom: 4px;
+        line-height: 1.5;
     }
     .resume-paper .skill-group .category {
-        font-size: 10px;
         font-weight: 700;
         color: #111827;
-        margin-bottom: 4px;
     }
-    .resume-paper .skill-group .tags {
-        line-height: 1.9;
-    }
-    .resume-paper .skill-group .tag {
-        display: inline-block;
-        background: #eff6ff;
-        border: 1px solid #bfdbfe;
-        color: #1d4ed8;
-        font-size: 9px;
-        padding: 1px 7px;
-        margin: 0 3px 3px 0;
-        border-radius: 3px;
-    }
-
-    /* ---- Strengths ---- */
-    .resume-paper table.strengths {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    .resume-paper table.strengths td {
-        font-size: 10px;
+    .resume-paper .skill-group .skills-inline {
         color: #374151;
-        padding: 2px 4px 2px 0;
-        width: 50%;
-        vertical-align: top;
-    }
-
-    /* ---- Achievements ---- */
-    .resume-paper .achievement-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-    .resume-paper .achievement-list li {
-        font-size: 10px;
-        color: #374151;
-        margin-bottom: 4px;
-        padding-left: 11px;
-        text-indent: -11px;
-    }
-    .resume-paper .achievement-list li::before {
-        content: "• ";
-        color: #1d4ed8;
-        font-weight: 700;
     }
 
     /* ---- Education ---- */
     .resume-paper .education-entry {
         margin-bottom: 8px;
     }
+    .resume-paper .education-entry .edu-head {
+        display: table;
+        width: 100%;
+    }
     .resume-paper .education-entry .degree {
-        font-size: 10.5px;
+        display: table-cell;
+        font-size: 9px;
         font-weight: 700;
         color: #111827;
     }
-    .resume-paper .education-entry .institution {
-        font-size: 10px;
-        color: #374151;
-    }
     .resume-paper .education-entry .dates {
-        font-size: 9.5px;
-        color: #1d4ed8;
-        font-weight: 600;
+        display: table-cell;
+        text-align: right;
+        font-size: 9px;
+        color: #6b7280;
+        white-space: nowrap;
+    }
+    .resume-paper .education-entry .institution {
+        font-size: 9px;
+        color: #374151;
         margin-top: 1px;
     }
 
@@ -384,7 +332,7 @@
     }
 
     /* ============================================================
-       FORMATTING TOOLBAR (Phase 2C)
+       FORMATTING TOOLBAR
        ============================================================ */
     .rb-toolbar {
         background: #111118;
@@ -419,6 +367,12 @@
         align-items: center;
         gap: 10px;
     }
+    .rb-toolbar-divider {
+        width: 100%;
+        height: 1px;
+        background: #1a1a24;
+        margin: 2px 0;
+    }
     .rb-toolbar-label {
         font-size: 12px;
         color: #9ca3af;
@@ -426,6 +380,16 @@
         text-transform: uppercase;
         letter-spacing: 0.5px;
         margin-right: -2px;
+    }
+    .rb-size-field {
+        display: inline-flex;
+        flex-direction: column;
+        gap: 3px;
+    }
+    .rb-size-field .rb-size-caption {
+        font-size: 10px;
+        color: #6b7280;
+        letter-spacing: 0.3px;
     }
     .rb-select {
         background: #1a1a24;
@@ -440,6 +404,10 @@
     .rb-select:focus {
         outline: none;
         border-color: #7c3aed;
+    }
+    .rb-select-sm {
+        padding: 5px 8px;
+        font-size: 12px;
     }
     .rb-bold-toggle {
         display: inline-flex;

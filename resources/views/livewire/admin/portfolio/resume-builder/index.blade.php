@@ -25,8 +25,17 @@
         </div>
     </div>
 
-    {{-- ============ FORMATTING TOOLBAR (Phase 2C) ============ --}}
-    @php $opts = $this->formattingOptions(); @endphp
+    {{-- ============ FORMATTING TOOLBAR ============ --}}
+    @php
+        $opts = $this->formattingOptions();
+        $sizeFields = [
+            'sizeName' => 'Name',
+            'sizeTagline' => 'Tagline',
+            'sizeContact' => 'Contact',
+            'sizeHeading' => 'Headings',
+            'sizeBody' => 'Body',
+        ];
+    @endphp
     <div class="rb-toolbar">
         <div class="rb-toolbar-head">
             <span class="rb-toolbar-scope">Applies to: <strong>Entire Resume</strong></span>
@@ -38,13 +47,6 @@
             <select wire:model.live="fontFamily" class="rb-select">
                 @foreach ($opts['fontFamilies'] as $key => $label)
                     <option value="{{ $key }}">{{ $label }}</option>
-                @endforeach
-            </select>
-
-            <label class="rb-toolbar-label">Size</label>
-            <select wire:model.live="fontSize" class="rb-select">
-                @foreach ($opts['fontSizes'] as $sz)
-                    <option value="{{ $sz }}">{{ $sz }}</option>
                 @endforeach
             </select>
 
@@ -61,9 +63,7 @@
                         title="{{ ucfirst($key) }}"></button>
                 @endforeach
             </div>
-        </div>
 
-        <div class="rb-toolbar-row">
             <label class="rb-toolbar-label">Align</label>
             <div class="rb-align-row">
                 @foreach ($opts['alignments'] as $a)
@@ -94,6 +94,24 @@
                 @endforeach
             </select>
         </div>
+
+        <div class="rb-toolbar-divider"></div>
+
+        {{-- Per-element font sizes (px) --}}
+        <div class="rb-toolbar-row">
+            <label class="rb-toolbar-label">Font size</label>
+            @foreach ($sizeFields as $prop => $label)
+                @php [$min, $max] = $opts['sizeRanges'][$prop]; @endphp
+                <span class="rb-size-field">
+                    <span class="rb-size-caption">{{ $label }} ({{ $min }}–{{ $max }})</span>
+                    <select wire:model.live="{{ $prop }}" class="rb-select rb-select-sm">
+                        @for ($s = $min; $s <= $max; $s++)
+                            <option value="{{ $s }}">{{ $s }}px</option>
+                        @endfor
+                    </select>
+                </span>
+            @endforeach
+        </div>
     </div>
 
     {{-- ============ LIVE PREVIEW (same partial used by PDF) ============ --}}
@@ -102,13 +120,10 @@
     {{-- ============ MODALS ============ --}}
     @if ($openModal !== null)
         @php
-            // Count summary shown in the modal title (e.g. "Work Experience — 2 of 3 jobs").
             $countSummary = match ($openModal) {
                 'work' => count($form['jobs'] ?? []) . ' of ' . $itemLimits['jobs'] . ' jobs',
                 'projects' => count($form['projects'] ?? []) . ' of ' . $itemLimits['projects'] . ' projects',
                 'skills' => count($form['groups'] ?? []) . ' of ' . $itemLimits['skill_groups'] . ' groups',
-                'strengths' => count($form['items'] ?? []) . ' of ' . $itemLimits['strengths'] . ' items',
-                'achievements' => count($form['items'] ?? []) . ' of ' . $itemLimits['achievements'] . ' items',
                 'education' => count($form['entries'] ?? []) . ' of ' . $itemLimits['educations'] . ' entries',
                 default => null,
             };
@@ -126,8 +141,6 @@
                             @case('work') Work Experience @break
                             @case('projects') Key Projects @break
                             @case('skills') Skills @break
-                            @case('strengths') Strengths @break
-                            @case('achievements') Key Achievements @break
                             @case('education') Education @break
                         @endswitch
                         @if ($countSummary)
@@ -151,7 +164,7 @@
                             </div>
                             <div style="grid-column: span 2;">
                                 <label class="rb-field-label">Tagline</label>
-                                <input type="text" wire:model.live.debounce.250ms="form.tagline" maxlength="{{ $fieldLimits['tagline'][1] }}" placeholder="e.g. Software Engineer | Laravel & Full-Stack" class="rb-input">
+                                <input type="text" wire:model.live.debounce.250ms="form.tagline" maxlength="{{ $fieldLimits['tagline'][1] }}" placeholder="e.g. Senior Software Engineer | Full-Stack Laravel Developer" class="rb-input">
                                 @include('livewire.admin.portfolio.resume-builder._counter', ['value' => $form['tagline'] ?? '', 'limit' => $fieldLimits['tagline']])
                             </div>
                             <div>
@@ -170,8 +183,13 @@
                                 @include('livewire.admin.portfolio.resume-builder._counter', ['value' => $form['location'] ?? '', 'limit' => $fieldLimits['location']])
                             </div>
                             <div>
+                                <label class="rb-field-label">LinkedIn URL</label>
+                                <input type="text" wire:model.live.debounce.250ms="form.linkedin" maxlength="{{ $fieldLimits['linkedin'][1] }}" placeholder="linkedin.com/in/username" class="rb-input">
+                                @include('livewire.admin.portfolio.resume-builder._counter', ['value' => $form['linkedin'] ?? '', 'limit' => $fieldLimits['linkedin']])
+                            </div>
+                            <div style="grid-column: span 2;">
                                 <label class="rb-field-label">GitHub URL</label>
-                                <input type="text" wire:model.live.debounce.250ms="form.github" maxlength="{{ $fieldLimits['github'][1] }}" class="rb-input">
+                                <input type="text" wire:model.live.debounce.250ms="form.github" maxlength="{{ $fieldLimits['github'][1] }}" placeholder="github.com/username" class="rb-input">
                                 @include('livewire.admin.portfolio.resume-builder._counter', ['value' => $form['github'] ?? '', 'limit' => $fieldLimits['github']])
                             </div>
                         </div>
@@ -181,7 +199,7 @@
                     @if ($openModal === 'profile')
                         <div>
                             <label class="rb-field-label">Summary</label>
-                            <textarea wire:model.live.debounce.250ms="form.summary" rows="6" maxlength="{{ $fieldLimits['profile'][1] }}" placeholder="Software Engineer with X+ years of experience…" class="rb-textarea"></textarea>
+                            <textarea wire:model.live.debounce.250ms="form.summary" rows="6" maxlength="{{ $fieldLimits['profile'][1] }}" placeholder="Senior Software Engineer with X+ years of experience…" class="rb-textarea"></textarea>
                             @include('livewire.admin.portfolio.resume-builder._counter', ['value' => $form['summary'] ?? '', 'limit' => $fieldLimits['profile']])
                         </div>
                     @endif
@@ -248,7 +266,6 @@
                     @if ($openModal === 'projects')
                         @php $projectsAtCap = count($form['projects'] ?? []) >= $itemLimits['projects']; @endphp
                         @foreach ($form['projects'] ?? [] as $pIndex => $p)
-                            @php $pBulletsAtCap = count($p['bullets'] ?? []) >= $itemLimits['project_bullets']; @endphp
                             <div class="rb-row-box">
                                 <div class="rb-row-head">
                                     <h4>Project #{{ $pIndex + 1 }}</h4>
@@ -261,24 +278,13 @@
                                     @include('livewire.admin.portfolio.resume-builder._counter', ['value' => $p['title'] ?? '', 'limit' => $fieldLimits['project.title']])
                                 </div>
                                 <div>
-                                    <input type="text" placeholder="Subtitle (company / URL)" wire:model.live.debounce.250ms="form.projects.{{ $pIndex }}.subtitle" maxlength="{{ $fieldLimits['project.subtitle'][1] }}" class="rb-input rb-input-sm">
-                                    @include('livewire.admin.portfolio.resume-builder._counter', ['value' => $p['subtitle'] ?? '', 'limit' => $fieldLimits['project.subtitle']])
+                                    <input type="text" placeholder="Project URL (e.g. autotheory.com)" wire:model.live.debounce.250ms="form.projects.{{ $pIndex }}.url" maxlength="{{ $fieldLimits['project.url'][1] }}" class="rb-input rb-input-sm">
+                                    @include('livewire.admin.portfolio.resume-builder._counter', ['value' => $p['url'] ?? '', 'limit' => $fieldLimits['project.url']])
                                 </div>
                                 <div>
-                                    <label class="rb-field-label-sm">Bullets ({{ count($p['bullets'] ?? []) }} of {{ $itemLimits['project_bullets'] }})</label>
-                                    @foreach ($p['bullets'] ?? [] as $bIndex => $b)
-                                        <div class="rb-inline-row">
-                                            <div style="flex:1;">
-                                                <input type="text" wire:model.live.debounce.250ms="form.projects.{{ $pIndex }}.bullets.{{ $bIndex }}" maxlength="{{ $fieldLimits['project.bullet'][1] }}" class="rb-input rb-input-sm" placeholder="Bullet point">
-                                                @include('livewire.admin.portfolio.resume-builder._counter', ['value' => $b ?? '', 'limit' => $fieldLimits['project.bullet']])
-                                            </div>
-                                            <button type="button" wire:click="removeBulletFromProject({{ $pIndex }}, {{ $bIndex }})" class="rb-icon-btn-x" title="Remove">
-                                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                                            </button>
-                                        </div>
-                                    @endforeach
-                                    <button type="button" wire:click="addBulletToProject({{ $pIndex }})" class="rb-btn-link-blue rb-btn-link-blue-sm" @if ($pBulletsAtCap) disabled @endif>+ add bullet</button>
-                                    @if ($pBulletsAtCap)<span class="rb-cap-hint">max {{ $itemLimits['project_bullets'] }} reached</span>@endif
+                                    <label class="rb-field-label-sm">Description</label>
+                                    <textarea wire:model.live.debounce.250ms="form.projects.{{ $pIndex }}.description" rows="3" maxlength="{{ $fieldLimits['project.description'][1] }}" class="rb-textarea" placeholder="One-paragraph description of the project."></textarea>
+                                    @include('livewire.admin.portfolio.resume-builder._counter', ['value' => $p['description'] ?? '', 'limit' => $fieldLimits['project.description']])
                                 </div>
                                 <div>
                                     <input type="text" placeholder="Tech stack (comma separated)" wire:model.live.debounce.250ms="form.projects.{{ $pIndex }}.tech" maxlength="{{ $fieldLimits['project.tech'][1] }}" class="rb-input rb-input-sm">
@@ -305,7 +311,7 @@
                                     @endif
                                 </div>
                                 <div>
-                                    <input type="text" placeholder="Category (e.g. Backend & Frontend)" wire:model.live.debounce.250ms="form.groups.{{ $gIndex }}.category" maxlength="{{ $fieldLimits['skill.category'][1] }}" class="rb-input rb-input-sm">
+                                    <input type="text" placeholder="Category (e.g. Languages & Frameworks)" wire:model.live.debounce.250ms="form.groups.{{ $gIndex }}.category" maxlength="{{ $fieldLimits['skill.category'][1] }}" class="rb-input rb-input-sm">
                                     @include('livewire.admin.portfolio.resume-builder._counter', ['value' => $group['category'] ?? '', 'limit' => $fieldLimits['skill.category']])
                                 </div>
                                 <div>
@@ -332,50 +338,6 @@
                         </div>
                     @endif
 
-                    {{-- ===== STRENGTHS MODAL ===== --}}
-                    @if ($openModal === 'strengths')
-                        @php $strengthsAtCap = count($form['items'] ?? []) >= $itemLimits['strengths']; @endphp
-                        @foreach ($form['items'] ?? [] as $iIndex => $item)
-                            <div class="rb-inline-row">
-                                <div style="flex:1;">
-                                    <input type="text" wire:model.live.debounce.250ms="form.items.{{ $iIndex }}" maxlength="{{ $fieldLimits['strength'][1] }}" class="rb-input rb-input-sm" placeholder="Strength (e.g. API Design)">
-                                    @include('livewire.admin.portfolio.resume-builder._counter', ['value' => $item ?? '', 'limit' => $fieldLimits['strength']])
-                                </div>
-                                @if (count($form['items']) > 1)
-                                    <button type="button" wire:click="removeRow('items', {{ $iIndex }})" class="rb-icon-btn-x" title="Remove">
-                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                                    </button>
-                                @endif
-                            </div>
-                        @endforeach
-                        <div>
-                            <button type="button" wire:click="addRow('items')" class="rb-btn-link-blue rb-btn-link-blue-md" @if ($strengthsAtCap) disabled @endif>+ add strength</button>
-                            @if ($strengthsAtCap)<span class="rb-cap-hint">max {{ $itemLimits['strengths'] }} reached</span>@endif
-                        </div>
-                    @endif
-
-                    {{-- ===== ACHIEVEMENTS MODAL ===== --}}
-                    @if ($openModal === 'achievements')
-                        @php $achievementsAtCap = count($form['items'] ?? []) >= $itemLimits['achievements']; @endphp
-                        @foreach ($form['items'] ?? [] as $iIndex => $item)
-                            <div class="rb-inline-row">
-                                <div style="flex:1;">
-                                    <input type="text" wire:model.live.debounce.250ms="form.items.{{ $iIndex }}" maxlength="{{ $fieldLimits['achievement'][1] }}" class="rb-input rb-input-sm" placeholder="Achievement bullet">
-                                    @include('livewire.admin.portfolio.resume-builder._counter', ['value' => $item ?? '', 'limit' => $fieldLimits['achievement']])
-                                </div>
-                                @if (count($form['items']) > 1)
-                                    <button type="button" wire:click="removeRow('items', {{ $iIndex }})" class="rb-icon-btn-x" title="Remove">
-                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                                    </button>
-                                @endif
-                            </div>
-                        @endforeach
-                        <div>
-                            <button type="button" wire:click="addRow('items')" class="rb-btn-link-blue rb-btn-link-blue-md" @if ($achievementsAtCap) disabled @endif>+ add achievement</button>
-                            @if ($achievementsAtCap)<span class="rb-cap-hint">max {{ $itemLimits['achievements'] }} reached</span>@endif
-                        </div>
-                    @endif
-
                     {{-- ===== EDUCATION MODAL ===== --}}
                     @if ($openModal === 'education')
                         @php $educationsAtCap = count($form['entries'] ?? []) >= $itemLimits['educations']; @endphp
@@ -388,7 +350,7 @@
                                     @endif
                                 </div>
                                 <div>
-                                    <input type="text" placeholder="Degree (e.g. B.S. Software Engineering)" wire:model.live.debounce.250ms="form.entries.{{ $eIndex }}.degree" maxlength="{{ $fieldLimits['education.degree'][1] }}" class="rb-input rb-input-sm">
+                                    <input type="text" placeholder="Degree (e.g. B.S. in Software Engineering)" wire:model.live.debounce.250ms="form.entries.{{ $eIndex }}.degree" maxlength="{{ $fieldLimits['education.degree'][1] }}" class="rb-input rb-input-sm">
                                     @include('livewire.admin.portfolio.resume-builder._counter', ['value' => $entry['degree'] ?? '', 'limit' => $fieldLimits['education.degree']])
                                 </div>
                                 <div>
@@ -417,7 +379,7 @@
 
                 <div class="rb-modal-footer">
                     @if ($formInvalid)
-                        <div class="rb-modal-warning">Some fields exceed the word limit. Trim them to save.</div>
+                        <div class="rb-modal-warning">Some fields exceed the limit. Trim them to save.</div>
                     @endif
                     <button type="button" wire:click="closeSection" class="rb-btn-secondary">Cancel</button>
                     <button type="button" wire:click="save" class="rb-btn-primary" @if ($formInvalid) disabled @endif>Save</button>

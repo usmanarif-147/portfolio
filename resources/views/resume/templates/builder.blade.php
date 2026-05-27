@@ -11,6 +11,7 @@
             box-shadow: none !important;
             width: auto !important;
             height: auto !important;
+            min-height: 0 !important;
             max-width: none !important;
             padding: 0 !important;
             margin: 0 !important;

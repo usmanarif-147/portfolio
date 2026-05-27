@@ -13,48 +13,54 @@ class ResumeBuilderIndex extends Component
     private const ITEM_LIMITS = [
         'jobs' => 3,
         'projects' => 3,
-        'skill_groups' => 5,
-        'strengths' => 6,
-        'achievements' => 4,
+        'skill_groups' => 7,
         'educations' => 2,
-        'job_bullets' => 3,
-        'project_bullets' => 3,
-        'skill_tags' => 8,
+        'job_bullets' => 5,
+        'skill_tags' => 10,
     ];
 
     private const FIELD_LIMITS = [
         'name' => [5, 40],
         'tagline' => [9, 70],
-        'phone' => [null, 20],
+        'phone' => [null, 25],
         'email' => [null, 50],
         'location' => [4, 30],
+        'linkedin' => [null, 50],
         'github' => [null, 50],
-        'profile' => [50, 350],
+        'profile' => [null, 650],
         'job.company' => [5, 40],
         'job.role' => [7, 50],
         'job.start' => [null, 20],
         'job.end' => [null, 20],
-        'job.bullet' => [20, 130],
-        'project.title' => [7, 60],
-        'project.subtitle' => [9, 70],
-        'project.bullet' => [20, 130],
-        'project.tech' => [15, 100],
+        'job.bullet' => [null, 200],
+        'project.title' => [null, 70],
+        'project.url' => [null, 60],
+        'project.description' => [null, 250],
+        'project.tech' => [null, 120],
         'skill.category' => [4, 30],
         'skill.tag' => [3, 25],
-        'strength' => [4, 30],
-        'achievement' => [16, 110],
         'education.degree' => [9, 70],
         'education.institution' => [9, 70],
         'education.start' => [1, 9],
         'education.end' => [1, 9],
     ];
 
+    /**
+     * Per-element font-size controls (px). Each element type is sized
+     * independently; the user picks a value inside the allowed range.
+     */
+    private const SIZE_RANGES = [
+        'sizeName' => [10, 30],
+        'sizeTagline' => [9, 20],
+        'sizeContact' => [9, 20],
+        'sizeHeading' => [9, 22],
+        'sizeBody' => [9, 15],
+    ];
+
     public ?string $openModal = null;
 
-    // ----- Formatting (Phase 2C): applied to entire resume -----
+    // ----- Formatting: applied to entire resume -----
     public string $fontFamily = 'helvetica';
-
-    public string $fontSize = '9pt';
 
     public bool $bold = false;
 
@@ -65,6 +71,17 @@ class ResumeBuilderIndex extends Component
     public string $lineSpacing = 'normal';
 
     public string $sectionSpacing = 'normal';
+
+    // ----- Per-element font sizes (px) -----
+    public int $sizeName = 22;
+
+    public int $sizeTagline = 10;
+
+    public int $sizeContact = 9;
+
+    public int $sizeHeading = 11;
+
+    public int $sizeBody = 9;
     // -----------------------------------------------------------
 
     public array $header = [];
@@ -77,13 +94,21 @@ class ResumeBuilderIndex extends Component
 
     public array $skillGroups = [];
 
-    public array $strengths = [];
-
-    public array $achievements = [];
-
     public array $educations = [];
 
     public array $form = [];
+
+    /**
+     * Clamp font-size selections into their allowed range (safety net —
+     * the dropdowns only offer valid values).
+     */
+    public function updated(string $name, $value): void
+    {
+        if (isset(self::SIZE_RANGES[$name])) {
+            [$min, $max] = self::SIZE_RANGES[$name];
+            $this->{$name} = max($min, min($max, (int) $value));
+        }
+    }
 
     public function openSection(string $section): void
     {
@@ -127,21 +152,6 @@ class ResumeBuilderIndex extends Component
         }
     }
 
-    public function addBulletToProject(int $projectIndex): void
-    {
-        if (count($this->form['projects'][$projectIndex]['bullets'] ?? []) >= self::ITEM_LIMITS['project_bullets']) {
-            return;
-        }
-        $this->form['projects'][$projectIndex]['bullets'][] = '';
-    }
-
-    public function removeBulletFromProject(int $projectIndex, int $bulletIndex): void
-    {
-        if (isset($this->form['projects'][$projectIndex]['bullets'][$bulletIndex])) {
-            array_splice($this->form['projects'][$projectIndex]['bullets'], $bulletIndex, 1);
-        }
-    }
-
     public function addTagToGroup(int $groupIndex): void
     {
         if (count($this->form['groups'][$groupIndex]['tags'] ?? []) >= self::ITEM_LIMITS['skill_tags']) {
@@ -169,8 +179,6 @@ class ResumeBuilderIndex extends Component
             'work' => $this->experiences = array_values($this->form['jobs'] ?? []),
             'projects' => $this->projects = array_values($this->form['projects'] ?? []),
             'skills' => $this->skillGroups = array_values($this->form['groups'] ?? []),
-            'strengths' => $this->strengths = array_values(array_filter($this->form['items'] ?? [], fn ($v) => trim((string) $v) !== '')),
-            'achievements' => $this->achievements = array_values(array_filter($this->form['items'] ?? [], fn ($v) => trim((string) $v) !== '')),
             'education' => $this->educations = array_values($this->form['entries'] ?? []),
             default => null,
         };
@@ -191,6 +199,7 @@ class ResumeBuilderIndex extends Component
                 'phone' => $this->form['phone'] ?? '',
                 'email' => $this->form['email'] ?? '',
                 'location' => $this->form['location'] ?? '',
+                'linkedin' => $this->form['linkedin'] ?? '',
                 'github' => $this->form['github'] ?? '',
             ]),
             'profile' => $this->checkFields([
@@ -199,8 +208,6 @@ class ResumeBuilderIndex extends Component
             'work' => $this->checkJobs(),
             'projects' => $this->checkProjects(),
             'skills' => $this->checkSkills(),
-            'strengths' => $this->checkSimpleList('strength', $this->form['items'] ?? []),
-            'achievements' => $this->checkSimpleList('achievement', $this->form['items'] ?? []),
             'education' => $this->checkEducation(),
             default => true,
         };
@@ -244,16 +251,12 @@ class ResumeBuilderIndex extends Component
         foreach ($this->form['projects'] ?? [] as $project) {
             $ok = $this->checkFields([
                 'project.title' => $project['title'] ?? '',
-                'project.subtitle' => $project['subtitle'] ?? '',
+                'project.url' => $project['url'] ?? '',
+                'project.description' => $project['description'] ?? '',
                 'project.tech' => $project['tech'] ?? '',
             ]);
             if (! $ok) {
                 return false;
-            }
-            foreach ($project['bullets'] ?? [] as $bullet) {
-                if ($this->isValueOverLimit((string) $bullet, self::FIELD_LIMITS['project.bullet'])) {
-                    return false;
-                }
             }
         }
 
@@ -270,17 +273,6 @@ class ResumeBuilderIndex extends Component
                 if ($this->isValueOverLimit((string) $tag, self::FIELD_LIMITS['skill.tag'])) {
                     return false;
                 }
-            }
-        }
-
-        return true;
-    }
-
-    private function checkSimpleList(string $limitKey, array $items): bool
-    {
-        foreach ($items as $item) {
-            if ($this->isValueOverLimit((string) $item, self::FIELD_LIMITS[$limitKey])) {
-                return false;
             }
         }
 
@@ -333,8 +325,6 @@ class ResumeBuilderIndex extends Component
             $this->openModal === 'work' && $key === 'jobs' => self::ITEM_LIMITS['jobs'],
             $this->openModal === 'projects' && $key === 'projects' => self::ITEM_LIMITS['projects'],
             $this->openModal === 'skills' && $key === 'groups' => self::ITEM_LIMITS['skill_groups'],
-            $this->openModal === 'strengths' && $key === 'items' => self::ITEM_LIMITS['strengths'],
-            $this->openModal === 'achievements' && $key === 'items' => self::ITEM_LIMITS['achievements'],
             $this->openModal === 'education' && $key === 'entries' => self::ITEM_LIMITS['educations'],
             default => null,
         };
@@ -351,14 +341,13 @@ class ResumeBuilderIndex extends Component
                 'phone' => '',
                 'email' => '',
                 'location' => '',
+                'linkedin' => '',
                 'github' => '',
             ],
             'profile' => ['summary' => $this->profile],
             'work' => ['jobs' => $this->experiences !== [] ? $this->experiences : [$this->blankJob()]],
             'projects' => ['projects' => $this->projects !== [] ? $this->projects : [$this->blankProject()]],
             'skills' => ['groups' => $this->skillGroups !== [] ? $this->skillGroups : [$this->blankSkillGroup()]],
-            'strengths' => ['items' => $this->strengths !== [] ? $this->strengths : ['']],
-            'achievements' => ['items' => $this->achievements !== [] ? $this->achievements : ['']],
             'education' => ['entries' => $this->educations !== [] ? $this->educations : [$this->blankEducation()]],
             default => [],
         };
@@ -391,8 +380,8 @@ class ResumeBuilderIndex extends Component
     {
         return [
             'title' => '',
-            'subtitle' => '',
-            'bullets' => [''],
+            'url' => '',
+            'description' => '',
             'tech' => '',
         ];
     }
@@ -418,12 +407,16 @@ class ResumeBuilderIndex extends Component
     public function resetFormatting(): void
     {
         $this->fontFamily = 'helvetica';
-        $this->fontSize = '9pt';
         $this->bold = false;
         $this->textColor = 'black';
         $this->textAlign = 'left';
         $this->lineSpacing = 'normal';
         $this->sectionSpacing = 'normal';
+        $this->sizeName = 22;
+        $this->sizeTagline = 10;
+        $this->sizeContact = 9;
+        $this->sizeHeading = 11;
+        $this->sizeBody = 9;
     }
 
     public function loadSampleData(): void
@@ -435,8 +428,6 @@ class ResumeBuilderIndex extends Component
         $this->experiences = $data['experiences'] ?? [];
         $this->projects = $data['projects'] ?? [];
         $this->skillGroups = $data['skill_groups'] ?? [];
-        $this->strengths = $data['strengths'] ?? [];
-        $this->achievements = $data['achievements'] ?? [];
         $this->educations = $data['educations'] ?? [];
     }
 
@@ -448,16 +439,18 @@ class ResumeBuilderIndex extends Component
             'experiences' => $this->experiences,
             'projects' => $this->projects,
             'skillGroups' => $this->skillGroups,
-            'strengths' => $this->strengths,
-            'achievements' => $this->achievements,
             'educations' => $this->educations,
             'fontFamily' => $this->fontFamily,
-            'fontSize' => $this->fontSize,
             'bold' => $this->bold,
             'textColor' => $this->textColor,
             'textAlign' => $this->textAlign,
             'lineSpacing' => $this->lineSpacing,
             'sectionSpacing' => $this->sectionSpacing,
+            'sizeName' => $this->sizeName,
+            'sizeTagline' => $this->sizeTagline,
+            'sizeContact' => $this->sizeContact,
+            'sizeHeading' => $this->sizeHeading,
+            'sizeBody' => $this->sizeBody,
         ])->setPaper('A4', 'portrait');
 
         $name = trim((string) ($this->header['name'] ?? ''));
@@ -486,11 +479,8 @@ class ResumeBuilderIndex extends Component
             'fontFamilies' => [
                 'helvetica' => 'Helvetica',
                 'calibri' => 'Calibri',
-                'dejavu' => 'DejaVu Sans',
-                'times' => 'Times',
-                'courier' => 'Courier',
             ],
-            'fontSizes' => ['9pt', '10pt', '11pt', '12pt'],
+            'sizeRanges' => self::SIZE_RANGES,
             'textColors' => [
                 'black' => '#1f2937',
                 'gray' => '#4b5563',
