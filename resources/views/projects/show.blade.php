@@ -72,13 +72,18 @@
             </div>
 
             {{-- Gallery --}}
-            @if(!empty($project->gallery))
+            @if($project->images->isNotEmpty())
                 <div class="mt-12">
                     <h2 class="mb-5 text-xl font-bold text-white">Gallery</h2>
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        @foreach($project->gallery as $image)
+                        @foreach($project->images as $image)
+                            @php
+                                $imgSrc = \Illuminate\Support\Str::startsWith($image->image_path, 'http')
+                                    ? $image->image_path
+                                    : asset('storage/'.$image->image_path);
+                            @endphp
                             <div class="overflow-hidden rounded-2xl border border-white/[0.04]">
-                                <img src="{{ $image }}" alt="{{ $project->title }} screenshot" loading="lazy"
+                                <img src="{{ $imgSrc }}" alt="{{ $image->alt_text ?? $project->title }}" loading="lazy"
                                      class="h-full w-full object-cover">
                             </div>
                         @endforeach

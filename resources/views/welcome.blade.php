@@ -10,10 +10,15 @@
                 </a>
 
                 <div class="hidden md:flex items-center space-x-8">
-                    <a href="#about" class="text-sm text-gray-500 hover:text-white transition-colors duration-200">About</a>
-                    <a href="#skills" class="text-sm text-gray-500 hover:text-white transition-colors duration-200">Skills</a>
-                    <a href="#experience" class="text-sm text-gray-500 hover:text-white transition-colors duration-200">Experience</a>
-                    <a href="#projects" class="text-sm text-gray-500 hover:text-white transition-colors duration-200">Projects</a>
+                    @if($technologies->isNotEmpty())
+                        <a href="#skills" class="text-sm text-gray-500 hover:text-white transition-colors duration-200">Skills</a>
+                    @endif
+                    @if($workExperiences->isNotEmpty())
+                        <a href="#experience" class="text-sm text-gray-500 hover:text-white transition-colors duration-200">Experience</a>
+                    @endif
+                    @if($projects->isNotEmpty())
+                        <a href="#projects" class="text-sm text-gray-500 hover:text-white transition-colors duration-200">Projects</a>
+                    @endif
                     @if($blogPosts->isNotEmpty())
                         <a href="#blog" class="text-sm text-gray-500 hover:text-white transition-colors duration-200">Blog</a>
                     @endif
@@ -33,10 +38,15 @@
 
         <div x-show="open" x-cloak x-transition class="md:hidden bg-dark-950 border-b border-white/[0.04]">
             <div class="px-4 py-4 space-y-3">
-                <a @click="open = false" href="#about" class="block text-gray-400 hover:text-white transition-colors">About</a>
-                <a @click="open = false" href="#skills" class="block text-gray-400 hover:text-white transition-colors">Skills</a>
-                <a @click="open = false" href="#experience" class="block text-gray-400 hover:text-white transition-colors">Experience</a>
-                <a @click="open = false" href="#projects" class="block text-gray-400 hover:text-white transition-colors">Projects</a>
+                @if($technologies->isNotEmpty())
+                    <a @click="open = false" href="#skills" class="block text-gray-400 hover:text-white transition-colors">Skills</a>
+                @endif
+                @if($workExperiences->isNotEmpty())
+                    <a @click="open = false" href="#experience" class="block text-gray-400 hover:text-white transition-colors">Experience</a>
+                @endif
+                @if($projects->isNotEmpty())
+                    <a @click="open = false" href="#projects" class="block text-gray-400 hover:text-white transition-colors">Projects</a>
+                @endif
                 @if($blogPosts->isNotEmpty())
                     <a @click="open = false" href="#blog" class="block text-gray-400 hover:text-white transition-colors">Blog</a>
                 @endif
@@ -53,7 +63,7 @@
                 <div class="flex-1 text-center md:text-left">
                     <p class="text-accent font-mono text-sm mb-4 tracking-wider uppercase animate-fade-in-up">Hi, I'm</p>
                     <h1 class="text-5xl md:text-7xl font-extrabold text-white mb-4 animate-fade-in-up" style="animation-delay: 100ms">
-                        {{ $user->name }}
+                        {{ $user?->name }}
                     </h1>
                     <h2 class="text-xl md:text-2xl text-accent font-semibold mb-6 animate-fade-in-up" style="animation-delay: 200ms">
                         {{ $profile->tagline ?? 'Developer' }}
@@ -62,10 +72,12 @@
                         {{ Str::before($profile->bio ?? '', "\n") }}
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start animate-fade-in-up" style="animation-delay: 400ms">
-                        <a href="#projects"
-                           class="px-8 py-3.5 bg-accent text-black font-extrabold text-sm uppercase tracking-widest rounded-xl hover:bg-accent-light transition-all duration-300 text-center">
-                            View Projects
-                        </a>
+                        @if($projects->isNotEmpty())
+                            <a href="#projects"
+                               class="px-8 py-3.5 bg-accent text-black font-extrabold text-sm uppercase tracking-widest rounded-xl hover:bg-accent-light transition-all duration-300 text-center">
+                                View Projects
+                            </a>
+                        @endif
                         <a href="#contact"
                            class="px-8 py-3.5 border border-accent/30 text-accent hover:bg-accent/10 font-semibold text-sm rounded-xl transition-all duration-300 text-center">
                             Get in Touch
@@ -79,7 +91,7 @@
                                 <img src="{{ asset('storage/' . $profile->profile_image) }}" alt="{{ $user->name }}" class="w-full h-full object-cover">
                             @else
                                 <div class="w-full h-full bg-dark-800 flex items-center justify-center">
-                                    <span class="text-6xl font-extrabold text-accent/30">{{ substr($user->name, 0, 1) }}</span>
+                                    <span class="text-6xl font-extrabold text-accent/30">{{ substr($user?->name ?? '?', 0, 1) }}</span>
                                 </div>
                             @endif
                         </div>
@@ -91,47 +103,8 @@
         </div>
     </section>
 
-    {{-- ==================== ABOUT ==================== --}}
-    <section id="about" class="py-24 md:py-32">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6">
-            <div x-data x-intersect.once="$el.classList.add('opacity-100', 'translate-y-0')"
-                 class="opacity-0 translate-y-8 transition-all duration-700">
-                <h2 class="text-3xl md:text-4xl font-extrabold text-white text-center mb-16">About Me</h2>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-                <div x-data x-intersect.once="$el.classList.add('opacity-100', 'translate-y-0')"
-                     class="opacity-0 translate-y-8 transition-all duration-700" style="transition-delay: 100ms">
-                    @foreach(explode("\n\n", $profile->bio ?? '') as $paragraph)
-                        <p class="text-gray-400 leading-relaxed text-lg {{ !$loop->first ? 'mt-4' : '' }}">
-                            {{ $paragraph }}
-                        </p>
-                    @endforeach
-                </div>
-
-                @if($skills->isNotEmpty())
-                    <div class="grid grid-cols-2 gap-4">
-                        @foreach ($skills as $skill)
-                            <div x-data x-intersect.once="$el.classList.add('opacity-100', 'translate-y-0')"
-                                 class="opacity-0 translate-y-8 transition-all duration-700 bg-dark-800 border border-white/[0.04] rounded-2xl p-6 text-center hover:border-accent/20 transition-all duration-300"
-                                 style="transition-delay: {{ ($loop->index + 2) * 100 }}ms">
-                                @if($skill->icon)
-                                    <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-accent/10 border border-accent/20 mb-3">
-                                        <svg class="w-6 h-6 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $skill->icon }}"/>
-                                        </svg>
-                                    </div>
-                                @endif
-                                <h3 class="text-white font-semibold text-sm">{{ $skill->title }}</h3>
-                            </div>
-                        @endforeach
-                    </div>
-                @endif
-            </div>
-        </div>
-    </section>
-
     {{-- ==================== SKILLS & TECHNOLOGIES ==================== --}}
+    @if($technologies->isNotEmpty())
     <section id="skills" class="py-24 md:py-32">
         <div class="max-w-6xl mx-auto px-4 sm:px-6">
             <div x-data x-intersect.once="$el.classList.add('opacity-100', 'translate-y-0')"
@@ -164,6 +137,7 @@
             </div>
         </div>
     </section>
+    @endif
 
     {{-- ==================== EXPERIENCE ==================== --}}
     @if($workExperiences->isNotEmpty())
@@ -406,7 +380,7 @@
         <div class="max-w-6xl mx-auto px-4 sm:px-6">
             <div class="flex flex-col md:flex-row items-center justify-between gap-4">
                 <p class="text-gray-600 text-sm">
-                    &copy; {{ date('Y') }} {{ $user->name }}. All rights reserved.
+                    &copy; {{ date('Y') }} {{ $user?->name }}. All rights reserved.
                 </p>
                 <a href="#hero"
                    class="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-accent transition-colors duration-200">

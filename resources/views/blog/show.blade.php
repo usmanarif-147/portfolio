@@ -24,10 +24,10 @@
             </div>
 
             {{-- Tags --}}
-            @if(!empty($post->tags))
+            @if($post->tags->isNotEmpty())
                 <div class="mb-4 flex flex-wrap gap-2">
                     @foreach($post->tags as $tag)
-                        <span class="rounded-full border border-accent/10 bg-accent/10 px-3 py-1 text-xs text-accent-light">{{ $tag }}</span>
+                        <span class="rounded-full border border-accent/10 bg-accent/10 px-3 py-1 text-xs text-accent-light">{{ $tag->tag }}</span>
                     @endforeach
                 </div>
             @endif
