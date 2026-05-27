@@ -34,8 +34,8 @@ class CategoryIndex extends Component
     {
         $category = Category::findOrFail($id);
 
-        if ($category->skills()->exists() || $category->technologies()->exists()) {
-            session()->flash('error', 'Cannot delete a category that still has skills or technologies assigned to it.');
+        if ($category->skills()->exists()) {
+            session()->flash('error', 'Cannot delete a category that still has skills assigned to it.');
 
             return;
         }
@@ -47,11 +47,11 @@ class CategoryIndex extends Component
     public function render()
     {
         $query = Category::query()
-            ->withCount(['skills', 'technologies'])
+            ->withCount(['skills'])
             ->ordered();
 
         if ($this->search) {
-            $query->where('name', 'like', '%'.$this->search.'%');
+            $query->where('name', 'like', '%' . $this->search . '%');
         }
 
         if ($this->activeFilter === 'active') {
