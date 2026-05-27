@@ -47,34 +47,6 @@
                 @error('category_id') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
             </div>
 
-            {{-- Proficiency --}}
-            <div x-data="{ proficiency: @entangle('proficiency') }">
-                <label for="proficiency" class="block text-sm font-medium text-gray-300 mb-2">
-                    Proficiency <span class="text-primary-light" x-text="proficiency + '%'"></span>
-                </label>
-                <input type="range" id="proficiency" x-model="proficiency" wire:model="proficiency"
-                       min="0" max="100" step="5"
-                       class="w-full h-2 bg-dark-700 rounded-lg appearance-none cursor-pointer accent-primary">
-                @error('proficiency') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
-            </div>
-
-            <div>
-                <label for="icon" class="block text-sm font-medium text-gray-300 mb-1.5">Icon (SVG path data)</label>
-                <textarea id="icon" wire:model="icon" rows="3"
-                          class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent font-mono text-sm"
-                          placeholder='<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M..."/>'></textarea>
-                @error('icon') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
-
-                @if ($icon)
-                    <div class="mt-3 p-4 bg-dark-700 rounded-lg">
-                        <p class="text-xs text-gray-500 mb-2">Preview:</p>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-8 h-8 text-primary-light">
-                            {!! $icon !!}
-                        </svg>
-                    </div>
-                @endif
-            </div>
-
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
                     <label for="sort_order" class="block text-sm font-medium text-gray-300 mb-1.5">Sort Order</label>

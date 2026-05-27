@@ -89,13 +89,18 @@
         {{-- Responsibilities --}}
         <div class="bg-dark-800 border border-dark-700 rounded-xl p-6">
             <div class="flex items-center justify-between mb-5">
-                <h2 class="text-lg font-mono font-semibold text-white uppercase tracking-wider">Responsibilities</h2>
+                <h2 class="text-lg font-mono font-semibold text-white uppercase tracking-wider">Responsibilities ({{ count($responsibilities) }} of {{ $this->maxResponsibilities() }})</h2>
                 <button type="button" wire:click="addResponsibility"
-                        class="text-primary-light hover:text-primary-light text-sm font-medium flex items-center gap-1 transition-colors">
+                        @disabled(count($responsibilities) >= $this->maxResponsibilities())
+                        class="text-primary-light hover:text-primary-light text-sm font-medium flex items-center gap-1 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
                     Add Responsibility
                 </button>
             </div>
+
+            @if (count($responsibilities) >= $this->maxResponsibilities())
+                <p class="mb-4 text-xs text-amber-400">Max {{ $this->maxResponsibilities() }} reached. Remove a responsibility to add another.</p>
+            @endif
 
             @if (count($responsibilities) > 0)
                 <div class="space-y-4">
@@ -108,9 +113,11 @@
                             </div>
                             <div class="flex-1">
                                 <label class="block text-xs font-medium text-gray-500 mb-1">Description</label>
-                                <textarea wire:model="responsibilities.{{ $index }}.description" rows="2"
+                                <textarea wire:model.live.debounce.300ms="responsibilities.{{ $index }}.description" rows="2"
+                                          maxlength="{{ $this->responsibilityCharLimit() }}"
                                           class="w-full bg-dark-700 border border-dark-600 rounded-lg px-3 py-2.5 text-white placeholder-gray-500 text-sm focus:ring-2 focus:ring-primary focus:border-transparent"
                                           placeholder="Describe the responsibility..."></textarea>
+                                <p class="mt-1 text-xs text-right {{ mb_strlen($responsibilities[$index]['description'] ?? '') > $this->responsibilityCharLimit() ? 'text-red-400' : 'text-gray-500' }}">{{ mb_strlen($responsibilities[$index]['description'] ?? '') }} / {{ $this->responsibilityCharLimit() }}</p>
                                 @error("responsibilities.{$index}.description") <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
                             </div>
                             <button type="button" wire:click="removeResponsibility({{ $index }})"

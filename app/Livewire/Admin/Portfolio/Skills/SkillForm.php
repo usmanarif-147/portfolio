@@ -17,10 +17,6 @@ class SkillForm extends Component
 
     public ?int $category_id = null;
 
-    public int $proficiency = 0;
-
-    public string $icon = '';
-
     public int $sort_order = 0;
 
     public bool $is_active = true;
@@ -31,8 +27,6 @@ class SkillForm extends Component
             $this->skill = $skill;
             $this->title = $skill->title;
             $this->category_id = $skill->category_id;
-            $this->proficiency = $skill->proficiency ?? 0;
-            $this->icon = $skill->icon ?? '';
             $this->sort_order = $skill->sort_order ?? 0;
             $this->is_active = $skill->is_active;
         }
@@ -43,8 +37,6 @@ class SkillForm extends Component
         $validated = $this->validate([
             'title' => 'required|string|max:255',
             'category_id' => 'required|integer|exists:categories,id',
-            'proficiency' => 'integer|min:0|max:100',
-            'icon' => 'nullable|string|max:5000',
             'sort_order' => 'integer|min:0',
             'is_active' => 'boolean',
         ]);

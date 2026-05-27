@@ -27,9 +27,10 @@
 
             <div>
                 <label for="short_description" class="block text-sm font-medium text-gray-300 mb-1.5">Short Description <span class="text-red-400">*</span></label>
-                <textarea id="short_description" wire:model="short_description" rows="3" maxlength="500"
+                <textarea id="short_description" wire:model.live.debounce.300ms="short_description" rows="3" maxlength="190"
                           class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
                           placeholder="A brief summary of the project..."></textarea>
+                <p class="mt-1 text-xs text-gray-500 text-right">{{ mb_strlen($short_description) }} / {{ $this->shortDescriptionMaxLength() }}</p>
                 @error('short_description') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
             </div>
 
@@ -44,17 +45,25 @@
 
         {{-- Section 2 — Tech Stack --}}
         <div class="bg-dark-800 border border-dark-700 rounded-xl p-6 space-y-5">
-            <h2 class="text-lg font-mono font-semibold text-white uppercase tracking-wider">Tech Stack</h2>
+            <div class="flex items-center justify-between">
+                <h2 class="text-lg font-mono font-semibold text-white uppercase tracking-wider">Tech Stack</h2>
+                <span class="text-xs font-mono {{ count($tech_stack) >= $this->maxTechTags() ? 'text-amber-400' : 'text-gray-500' }}">{{ count($tech_stack) }} / {{ $this->maxTechTags() }}</span>
+            </div>
 
             <div class="flex gap-2">
                 <input type="text" wire:model="techInput" wire:keydown.enter.prevent="addTech"
-                       class="flex-1 bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
+                       @disabled(count($tech_stack) >= $this->maxTechTags())
+                       class="flex-1 bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                        placeholder="e.g. Laravel, Vue.js, Tailwind CSS">
                 <button type="button" wire:click="addTech"
-                        class="bg-primary hover:bg-primary-hover text-white font-medium rounded-lg px-4 py-2.5 transition-colors text-sm">
+                        @disabled(count($tech_stack) >= $this->maxTechTags())
+                        class="bg-primary hover:bg-primary-hover text-white font-medium rounded-lg px-4 py-2.5 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary">
                     Add
                 </button>
             </div>
+            @if (count($tech_stack) >= $this->maxTechTags())
+                <p class="mt-1 text-xs text-amber-400">Max {{ $this->maxTechTags() }} reached. Remove a tag to add another.</p>
+            @endif
             @error('techInput') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
 
             @if (count($tech_stack) > 0)

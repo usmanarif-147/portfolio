@@ -10,6 +10,10 @@ use Livewire\Component;
 #[Layout('components.layouts.admin')]
 class ExperienceForm extends Component
 {
+    public const MAX_RESPONSIBILITIES = 5;
+
+    private const RESP_BULLET_LIMITS = [1 => 720, 2 => 360, 3 => 235, 4 => 180, 5 => 145];
+
     public ?Experience $experience = null;
 
     public string $role = '';
@@ -55,8 +59,25 @@ class ExperienceForm extends Component
         }
     }
 
+    public function maxResponsibilities(): int
+    {
+        return self::MAX_RESPONSIBILITIES;
+    }
+
+    public function responsibilityCharLimit(): int
+    {
+        $n = count($this->responsibilities);
+        $n = max(1, min(self::MAX_RESPONSIBILITIES, $n));
+
+        return self::RESP_BULLET_LIMITS[$n];
+    }
+
     public function addResponsibility(): void
     {
+        if (count($this->responsibilities) >= self::MAX_RESPONSIBILITIES) {
+            return;
+        }
+
         $this->responsibilities[] = [
             'id' => null,
             'description' => '',
@@ -71,6 +92,8 @@ class ExperienceForm extends Component
 
     public function save(ExperienceService $service): void
     {
+        $bulletLimit = $this->responsibilityCharLimit();
+
         $validated = $this->validate([
             'role' => 'required|string|max:255',
             'company' => 'required|string|max:255',
@@ -80,8 +103,12 @@ class ExperienceForm extends Component
             'description' => 'nullable|string|max:500',
             'sort_order' => 'integer|min:0',
             'is_active' => 'boolean',
-            'responsibilities' => 'array',
-            'responsibilities.*.description' => 'required|string|max:1000',
+            'responsibilities' => 'array|max:'.self::MAX_RESPONSIBILITIES,
+            'responsibilities.*.description' => ['required', 'string', function ($attribute, $value, $fail) use ($bulletLimit) {
+                if (mb_strlen($value) > $bulletLimit) {
+                    $fail("Each bullet must be {$bulletLimit} characters or fewer when this job has ".count($this->responsibilities).' bullet(s).');
+                }
+            }],
             'responsibilities.*.sort_order' => 'integer|min:0',
         ]);
 

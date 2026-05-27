@@ -1,7 +1,5 @@
 <div>
-    @include('resume.templates._fonts', ['pdf' => false])
     @include('resume.templates._styles')
-    @include('resume.templates._format_overrides')
 
     {{-- ============ PAGE CHROME ============ --}}
     <div class="rb-page-header">
@@ -22,95 +20,6 @@
                 </svg>
                 Download PDF
             </button>
-        </div>
-    </div>
-
-    {{-- ============ FORMATTING TOOLBAR ============ --}}
-    @php
-        $opts = $this->formattingOptions();
-        $sizeFields = [
-            'sizeName' => 'Name',
-            'sizeTagline' => 'Tagline',
-            'sizeContact' => 'Contact',
-            'sizeHeading' => 'Headings',
-            'sizeBody' => 'Body',
-        ];
-    @endphp
-    <div class="rb-toolbar">
-        <div class="rb-toolbar-head">
-            <span class="rb-toolbar-scope">Applies to: <strong>Entire Resume</strong></span>
-            <button type="button" wire:click="resetFormatting" class="rb-reset-btn">Reset to defaults</button>
-        </div>
-
-        <div class="rb-toolbar-row">
-            <label class="rb-toolbar-label">Font</label>
-            <select wire:model.live="fontFamily" class="rb-select">
-                @foreach ($opts['fontFamilies'] as $key => $label)
-                    <option value="{{ $key }}">{{ $label }}</option>
-                @endforeach
-            </select>
-
-            <button type="button" wire:click="$toggle('bold')" class="rb-bold-toggle {{ $bold ? 'rb-bold-toggle-active' : '' }}" title="Toggle Bold">
-                <strong>B</strong>
-            </button>
-
-            <label class="rb-toolbar-label">Color</label>
-            <div class="rb-color-row">
-                @foreach ($opts['textColors'] as $key => $hex)
-                    <button type="button" wire:click="$set('textColor', '{{ $key }}')"
-                        class="rb-color-swatch {{ $textColor === $key ? 'rb-color-swatch-active' : '' }}"
-                        style="background: {{ $hex }};"
-                        title="{{ ucfirst($key) }}"></button>
-                @endforeach
-            </div>
-
-            <label class="rb-toolbar-label">Align</label>
-            <div class="rb-align-row">
-                @foreach ($opts['alignments'] as $a)
-                    <button type="button" wire:click="$set('textAlign', '{{ $a }}')"
-                        class="rb-align-btn {{ $textAlign === $a ? 'rb-align-btn-active' : '' }}"
-                        title="Align {{ $a }}">
-                        @switch($a)
-                            @case('left') ⇤ @break
-                            @case('center') ≡ @break
-                            @case('right') ⇥ @break
-                            @case('justify') ⇔ @break
-                        @endswitch
-                    </button>
-                @endforeach
-            </div>
-
-            <label class="rb-toolbar-label">Line</label>
-            <select wire:model.live="lineSpacing" class="rb-select">
-                @foreach ($opts['lineSpacings'] as $key => $label)
-                    <option value="{{ $key }}">{{ $label }}</option>
-                @endforeach
-            </select>
-
-            <label class="rb-toolbar-label">Section</label>
-            <select wire:model.live="sectionSpacing" class="rb-select">
-                @foreach ($opts['sectionSpacings'] as $key => $label)
-                    <option value="{{ $key }}">{{ $label }}</option>
-                @endforeach
-            </select>
-        </div>
-
-        <div class="rb-toolbar-divider"></div>
-
-        {{-- Per-element font sizes (px) --}}
-        <div class="rb-toolbar-row">
-            <label class="rb-toolbar-label">Font size</label>
-            @foreach ($sizeFields as $prop => $label)
-                @php [$min, $max] = $opts['sizeRanges'][$prop]; @endphp
-                <span class="rb-size-field">
-                    <span class="rb-size-caption">{{ $label }} ({{ $min }}–{{ $max }})</span>
-                    <select wire:model.live="{{ $prop }}" class="rb-select rb-select-sm">
-                        @for ($s = $min; $s <= $max; $s++)
-                            <option value="{{ $s }}">{{ $s }}px</option>
-                        @endfor
-                    </select>
-                </span>
-            @endforeach
         </div>
     </div>
 

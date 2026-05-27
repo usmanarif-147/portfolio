@@ -12,8 +12,6 @@ class Skill extends Model
     protected $fillable = [
         'title',
         'category_id',
-        'proficiency',
-        'icon',
         'sort_order',
         'is_active',
     ];
@@ -22,7 +20,6 @@ class Skill extends Model
     {
         return [
             'is_active' => 'boolean',
-            'proficiency' => 'integer',
         ];
     }
 

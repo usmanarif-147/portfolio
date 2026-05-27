@@ -48,8 +48,6 @@
                     <tr class="bg-dark-700/50">
                         <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Title</th>
                         <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Category</th>
-                        <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Proficiency</th>
-                        <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Icon</th>
                         <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Sort Order</th>
                         <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Status</th>
                         <th class="text-right text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Actions</th>
@@ -66,25 +64,6 @@
                                     </span>
                                 @else
                                     <span class="text-gray-600">—</span>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4 text-sm text-gray-400">
-                                <div class="flex items-center gap-2">
-                                    <div class="w-24 bg-dark-700 rounded-full h-2">
-                                        <div class="bg-primary h-2 rounded-full" style="width: {{ $skill->proficiency }}%"></div>
-                                    </div>
-                                    <span class="text-xs">{{ $skill->proficiency }}%</span>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4">
-                                @if ($skill->icon)
-                                    <div class="w-8 h-8 text-primary-light">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" class="w-6 h-6">
-                                            {!! $skill->icon !!}
-                                        </svg>
-                                    </div>
-                                @else
-                                    <span class="text-gray-500 text-sm">—</span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-400">{{ $skill->sort_order }}</td>
@@ -115,7 +94,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                            <td colspan="5" class="px-6 py-12 text-center text-gray-500">
                                 No skills found. <a href="{{ route('admin.skills.create') }}" wire:navigate class="text-primary-light hover:underline">Create one</a>.
                             </td>
                         </tr>

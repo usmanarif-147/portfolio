@@ -1,14 +1,13 @@
 <style>
     /* ============================================================
        RESUME PAPER — shared by on-screen preview AND PDF.
-       Single-column layout. Per-element font sizes are applied by
-       _format_overrides.blade.php (included after this file).
+       Single-column layout with fixed styling (no user controls).
        ============================================================ */
     .resume-paper {
         background: #ffffff;
         color: #1f2937;
         font-family: Helvetica, Arial, sans-serif;
-        font-size: 9px;
+        font-size: 11px;
         line-height: 1.45;
         width: 210mm;
         min-height: 297mm;
@@ -26,14 +25,14 @@
         position: relative;
     }
     .resume-paper .resume-header h1 {
-        font-size: 22px;
+        font-size: 21px;
         font-weight: 700;
         color: #1d4ed8;
         letter-spacing: 0.5px;
         margin: 0 0 3px 0;
     }
     .resume-paper .resume-header .tagline {
-        font-size: 10px;
+        font-size: 11px;
         font-weight: 700;
         color: #374151;
         text-transform: uppercase;
@@ -41,7 +40,7 @@
         margin-bottom: 7px;
     }
     .resume-paper .resume-header .contact {
-        font-size: 9px;
+        font-size: 11px;
         color: #4b5563;
     }
     .resume-paper .empty-hint {
@@ -53,7 +52,7 @@
 
     /* ---- Section heading ---- */
     .resume-paper .section {
-        margin-bottom: 11px;
+        margin-bottom: 6px;
         position: relative;
     }
     .resume-paper .section-title-row {
@@ -82,7 +81,7 @@
 
     /* ---- Professional summary ---- */
     .resume-paper .summary {
-        font-size: 9px;
+        font-size: 11px;
         color: #374151;
         margin: 0;
     }
@@ -98,20 +97,20 @@
     .resume-paper .job .company {
         display: table-cell;
         width: 100%;
-        font-size: 9px;
+        font-size: 11px;
         font-weight: 700;
         color: #111827;
     }
     .resume-paper .job .dates {
         display: table-cell;
         text-align: right;
-        font-size: 9px;
+        font-size: 11px;
         color: #6b7280;
         font-style: italic;
         white-space: nowrap;
     }
     .resume-paper .job .role {
-        font-size: 9px;
+        font-size: 11px;
         color: #4b5563;
         font-style: italic;
         margin: 1px 0 4px 0;
@@ -122,7 +121,7 @@
         margin: 0;
     }
     .resume-paper ul.bullets li {
-        font-size: 9px;
+        font-size: 11px;
         color: #374151;
         margin-bottom: 2px;
         padding-left: 11px;
@@ -145,24 +144,24 @@
     .resume-paper .project .title {
         display: table-cell;
         width: 100%;
-        font-size: 9px;
+        font-size: 11px;
         font-weight: 700;
         color: #111827;
     }
     .resume-paper .project .url {
         display: table-cell;
         text-align: right;
-        font-size: 9px;
+        font-size: 11px;
         color: #1d4ed8;
         white-space: nowrap;
     }
     .resume-paper .project .desc {
-        font-size: 9px;
+        font-size: 11px;
         color: #374151;
         margin: 2px 0 0 0;
     }
     .resume-paper .project .tech {
-        font-size: 9px;
+        font-size: 11px;
         color: #374151;
         margin-top: 2px;
     }
@@ -175,7 +174,7 @@
 
     /* ---- Skills (inline, comma-separated) ---- */
     .resume-paper .skill-group {
-        font-size: 9px;
+        font-size: 11px;
         color: #374151;
         margin-bottom: 4px;
         line-height: 1.5;
@@ -199,19 +198,19 @@
     .resume-paper .education-entry .degree {
         display: table-cell;
         width: 100%;
-        font-size: 9px;
+        font-size: 11px;
         font-weight: 700;
         color: #111827;
     }
     .resume-paper .education-entry .dates {
         display: table-cell;
         text-align: right;
-        font-size: 9px;
+        font-size: 11px;
         color: #6b7280;
         white-space: nowrap;
     }
     .resume-paper .education-entry .institution {
-        font-size: 9px;
+        font-size: 11px;
         color: #374151;
         margin-top: 1px;
     }
@@ -329,170 +328,6 @@
         white-space: nowrap;
     }
     .rb-secondary-btn:hover {
-        background: #1a1a24;
-        color: #ffffff;
-        border-color: #7c3aed;
-    }
-
-    /* ============================================================
-       FORMATTING TOOLBAR
-       ============================================================ */
-    .rb-toolbar {
-        background: #111118;
-        border: 1px solid #1a1a24;
-        border-radius: 10px;
-        padding: 14px 18px;
-        margin: 0 auto 16px auto;
-        max-width: 1000px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-    .rb-toolbar-head {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 2px;
-    }
-    .rb-toolbar-scope {
-        font-size: 12px;
-        color: #9ca3af;
-        font-family: 'Fira Code', monospace;
-        letter-spacing: 0.5px;
-    }
-    .rb-toolbar-scope strong {
-        color: #a78bfa;
-        font-weight: 600;
-    }
-    .rb-toolbar-row {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 10px;
-    }
-    .rb-toolbar-divider {
-        width: 100%;
-        height: 1px;
-        background: #1a1a24;
-        margin: 2px 0;
-    }
-    .rb-toolbar-label {
-        font-size: 12px;
-        color: #9ca3af;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-right: -2px;
-    }
-    .rb-size-field {
-        display: inline-flex;
-        flex-direction: column;
-        gap: 3px;
-    }
-    .rb-size-field .rb-size-caption {
-        font-size: 10px;
-        color: #6b7280;
-        letter-spacing: 0.3px;
-    }
-    .rb-select {
-        background: #1a1a24;
-        border: 1px solid #25253a;
-        border-radius: 6px;
-        padding: 6px 10px;
-        color: #ffffff;
-        font-size: 13px;
-        font-family: inherit;
-        cursor: pointer;
-    }
-    .rb-select:focus {
-        outline: none;
-        border-color: #7c3aed;
-    }
-    .rb-select-sm {
-        padding: 5px 8px;
-        font-size: 12px;
-    }
-    .rb-bold-toggle {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 32px;
-        height: 32px;
-        background: #1a1a24;
-        border: 1px solid #25253a;
-        border-radius: 6px;
-        color: #d1d5db;
-        cursor: pointer;
-        font-family: inherit;
-        font-size: 14px;
-        transition: background-color 120ms, border-color 120ms, color 120ms;
-    }
-    .rb-bold-toggle:hover {
-        border-color: #7c3aed;
-        color: #ffffff;
-    }
-    .rb-bold-toggle-active {
-        background: #7c3aed;
-        border-color: #7c3aed;
-        color: #ffffff;
-    }
-    .rb-color-row,
-    .rb-align-row {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-    }
-    .rb-color-swatch {
-        width: 22px;
-        height: 22px;
-        border-radius: 50%;
-        border: 2px solid transparent;
-        cursor: pointer;
-        padding: 0;
-        transition: border-color 120ms, transform 120ms;
-    }
-    .rb-color-swatch:hover {
-        transform: scale(1.1);
-    }
-    .rb-color-swatch-active {
-        border-color: #a78bfa;
-        box-shadow: 0 0 0 2px rgba(167, 139, 250, 0.35);
-    }
-    .rb-align-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 30px;
-        height: 30px;
-        background: #1a1a24;
-        border: 1px solid #25253a;
-        border-radius: 6px;
-        color: #d1d5db;
-        cursor: pointer;
-        font-size: 15px;
-        font-family: inherit;
-        transition: background-color 120ms, border-color 120ms, color 120ms;
-    }
-    .rb-align-btn:hover {
-        border-color: #7c3aed;
-        color: #ffffff;
-    }
-    .rb-align-btn-active {
-        background: #7c3aed;
-        border-color: #7c3aed;
-        color: #ffffff;
-    }
-    .rb-reset-btn {
-        background: transparent;
-        border: 1px solid #25253a;
-        color: #9ca3af;
-        font-size: 12px;
-        padding: 5px 12px;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: background-color 120ms, color 120ms, border-color 120ms;
-    }
-    .rb-reset-btn:hover {
         background: #1a1a24;
         color: #ffffff;
         border-color: #7c3aed;

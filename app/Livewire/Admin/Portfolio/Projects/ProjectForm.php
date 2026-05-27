@@ -81,6 +81,10 @@ class ProjectForm extends Component
 
     public function addTech(): void
     {
+        if (count($this->tech_stack) >= 8) {
+            return;
+        }
+
         $tech = trim($this->techInput);
 
         if ($tech !== '') {
@@ -127,9 +131,9 @@ class ProjectForm extends Component
 
         $validated = $this->validate([
             'title' => 'required|string|max:200',
-            'short_description' => 'required|string|max:500',
+            'short_description' => 'required|string|max:190',
             'description' => 'nullable|string',
-            'tech_stack' => 'array',
+            'tech_stack' => 'array|max:8',
             'demo_url' => 'nullable|url|max:255',
             'github_url' => 'nullable|url|max:255',
             'is_featured' => 'boolean',
@@ -167,6 +171,16 @@ class ProjectForm extends Component
 
         session()->flash('success', $message);
         $this->redirect(route('admin.projects.index'), navigate: true);
+    }
+
+    public function shortDescriptionMaxLength(): int
+    {
+        return 190;
+    }
+
+    public function maxTechTags(): int
+    {
+        return 8;
     }
 
     public function render()

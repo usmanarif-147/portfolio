@@ -15,8 +15,6 @@ return new class extends Migration
                 ->nullable()
                 ->constrained('categories')
                 ->nullOnDelete();
-            $table->unsignedTinyInteger('proficiency')->default(0);
-            $table->text('icon')->nullable();
             $table->unsignedInteger('sort_order')->default(0);
             $table->boolean('is_active')->default(true);
             $table->timestamps();

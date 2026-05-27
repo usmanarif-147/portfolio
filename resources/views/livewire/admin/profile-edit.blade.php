@@ -21,9 +21,10 @@
 
                     <div>
                         <label for="bio" class="block text-sm font-medium text-gray-300 mb-1.5">Bio</label>
-                        <textarea id="bio" wire:model="bio" rows="5"
+                        <textarea id="bio" wire:model.live.debounce.300ms="bio" rows="5" maxlength="430"
                                   class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent"
                                   placeholder="Tell visitors about yourself..."></textarea>
+                        <p class="mt-1 text-xs text-gray-500 text-right">{{ mb_strlen($bio) }} / {{ $this->bioMaxLength() }}</p>
                         @error('bio') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
                     </div>
 

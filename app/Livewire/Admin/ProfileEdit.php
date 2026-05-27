@@ -70,7 +70,7 @@ class ProfileEdit extends Component
     {
         $validated = $this->validate([
             'tagline' => 'nullable|string|max:255',
-            'bio' => 'nullable|string|max:5000',
+            'bio' => 'nullable|string|max:430',
             'profile_image' => 'nullable|image|max:2048|mimes:jpg,jpeg,png,webp',
             'secondary_email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:50',
@@ -100,6 +100,11 @@ class ProfileEdit extends Component
 
         session()->flash('success', 'Profile updated successfully.');
         $this->redirect(route('admin.profile.edit'), navigate: true);
+    }
+
+    public function bioMaxLength(): int
+    {
+        return 430;
     }
 
     public function render()

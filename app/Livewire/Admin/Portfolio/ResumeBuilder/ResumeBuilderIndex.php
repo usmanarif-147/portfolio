@@ -45,44 +45,7 @@ class ResumeBuilderIndex extends Component
         'education.end' => [1, 9],
     ];
 
-    /**
-     * Per-element font-size controls (px). Each element type is sized
-     * independently; the user picks a value inside the allowed range.
-     */
-    private const SIZE_RANGES = [
-        'sizeName' => [10, 30],
-        'sizeTagline' => [9, 20],
-        'sizeContact' => [9, 20],
-        'sizeHeading' => [9, 22],
-        'sizeBody' => [9, 15],
-    ];
-
     public ?string $openModal = null;
-
-    // ----- Formatting: applied to entire resume -----
-    public string $fontFamily = 'helvetica';
-
-    public bool $bold = false;
-
-    public string $textColor = 'black';
-
-    public string $textAlign = 'left';
-
-    public string $lineSpacing = 'normal';
-
-    public string $sectionSpacing = 'normal';
-
-    // ----- Per-element font sizes (px) -----
-    public int $sizeName = 22;
-
-    public int $sizeTagline = 10;
-
-    public int $sizeContact = 9;
-
-    public int $sizeHeading = 11;
-
-    public int $sizeBody = 9;
-    // -----------------------------------------------------------
 
     public array $header = [];
 
@@ -97,18 +60,6 @@ class ResumeBuilderIndex extends Component
     public array $educations = [];
 
     public array $form = [];
-
-    /**
-     * Clamp font-size selections into their allowed range (safety net —
-     * the dropdowns only offer valid values).
-     */
-    public function updated(string $name, $value): void
-    {
-        if (isset(self::SIZE_RANGES[$name])) {
-            [$min, $max] = self::SIZE_RANGES[$name];
-            $this->{$name} = max($min, min($max, (int) $value));
-        }
-    }
 
     public function openSection(string $section): void
     {
@@ -404,21 +355,6 @@ class ResumeBuilderIndex extends Component
         ];
     }
 
-    public function resetFormatting(): void
-    {
-        $this->fontFamily = 'helvetica';
-        $this->bold = false;
-        $this->textColor = 'black';
-        $this->textAlign = 'left';
-        $this->lineSpacing = 'normal';
-        $this->sectionSpacing = 'normal';
-        $this->sizeName = 22;
-        $this->sizeTagline = 10;
-        $this->sizeContact = 9;
-        $this->sizeHeading = 11;
-        $this->sizeBody = 9;
-    }
-
     public function loadSampleData(): void
     {
         $data = require __DIR__.'/sample-data.php';
@@ -440,17 +376,6 @@ class ResumeBuilderIndex extends Component
             'projects' => $this->projects,
             'skillGroups' => $this->skillGroups,
             'educations' => $this->educations,
-            'fontFamily' => $this->fontFamily,
-            'bold' => $this->bold,
-            'textColor' => $this->textColor,
-            'textAlign' => $this->textAlign,
-            'lineSpacing' => $this->lineSpacing,
-            'sectionSpacing' => $this->sectionSpacing,
-            'sizeName' => $this->sizeName,
-            'sizeTagline' => $this->sizeTagline,
-            'sizeContact' => $this->sizeContact,
-            'sizeHeading' => $this->sizeHeading,
-            'sizeBody' => $this->sizeBody,
         ])->setPaper('A4', 'portrait');
 
         $name = trim((string) ($this->header['name'] ?? ''));
@@ -468,29 +393,5 @@ class ResumeBuilderIndex extends Component
             'itemLimits' => self::ITEM_LIMITS,
             'fieldLimits' => self::FIELD_LIMITS,
         ]);
-    }
-
-    /**
-     * Limited-choice maps exposed to the toolbar view for rendering dropdowns / swatches.
-     */
-    public function formattingOptions(): array
-    {
-        return [
-            'fontFamilies' => [
-                'helvetica' => 'Helvetica',
-                'calibri' => 'Calibri',
-            ],
-            'sizeRanges' => self::SIZE_RANGES,
-            'textColors' => [
-                'black' => '#1f2937',
-                'gray' => '#4b5563',
-                'blue' => '#1d4ed8',
-                'red' => '#991b1b',
-                'green' => '#15803d',
-            ],
-            'alignments' => ['left', 'center', 'right', 'justify'],
-            'lineSpacings' => ['tight' => 'Tight', 'normal' => 'Normal', 'loose' => 'Loose'],
-            'sectionSpacings' => ['compact' => 'Compact', 'normal' => 'Normal', 'spacious' => 'Spacious'],
-        ];
     }
 }

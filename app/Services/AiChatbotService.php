@@ -56,9 +56,7 @@ class AiChatbotService
             if ($skills->isNotEmpty()) {
                 $context .= "\n=== SKILLS ===\n";
                 $context .= $skills->map(function ($skill) {
-                    $proficiency = $skill->proficiency ? " (Proficiency: {$skill->proficiency}%)" : '';
-
-                    return "- {$skill->title}{$proficiency}";
+                    return "- {$skill->title}";
                 })->implode("\n");
                 $context .= "\n";
             }
