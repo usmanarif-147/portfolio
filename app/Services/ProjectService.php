@@ -5,21 +5,26 @@ namespace App\Services;
 use App\Models\Project\Project;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ProjectService
 {
+    public function __construct(private ImageUploadService $images) {}
+
     public function create(array $data, ?UploadedFile $coverImage = null, array $galleryImages = []): Project
     {
         return DB::transaction(function () use ($data, $coverImage, $galleryImages) {
             $data['slug'] = $this->generateUniqueSlug($data['title']);
-
-            if ($coverImage) {
-                $data['cover_image'] = $coverImage->store('projects/covers', 'public');
-            }
+            unset($data['cover_image']); // set after we have an id (folder = projects/{id}/images)
 
             $project = Project::create($data);
+
+            if ($coverImage) {
+                $project->update([
+                    'cover_image' => $this->images->store($coverImage, $this->imageDir($project)),
+                ]);
+            }
+
             $this->storeGalleryImages($project, $galleryImages);
 
             return $project;
@@ -34,12 +39,10 @@ class ProjectService
             }
 
             if ($coverImage) {
-                if ($project->cover_image) {
-                    Storage::disk('public')->delete($project->cover_image);
-                }
-                $data['cover_image'] = $coverImage->store('projects/covers', 'public');
+                $this->images->delete($project->cover_image);
+                $data['cover_image'] = $this->images->store($coverImage, $this->imageDir($project));
             } elseif (array_key_exists('cover_image', $data) && $data['cover_image'] === null && $project->cover_image) {
-                Storage::disk('public')->delete($project->cover_image);
+                $this->images->delete($project->cover_image);
             }
 
             $project->update($data);
@@ -56,17 +59,16 @@ class ProjectService
 
     public function delete(Project $project): void
     {
-        // Delete cover image
-        if ($project->cover_image) {
-            Storage::disk('public')->delete($project->cover_image);
-        }
+        // One shot: removes cover + every gallery image for this project.
+        $this->images->deleteDirectory("projects/{$project->id}");
 
-        // Delete gallery images from storage
-        foreach ($project->images as $image) {
-            Storage::disk('public')->delete($image->image_path);
-        }
-
+        // project_images rows cascade on delete (FK).
         $project->delete();
+    }
+
+    private function imageDir(Project $project): string
+    {
+        return "projects/{$project->id}/images";
     }
 
     private function generateUniqueSlug(string $title, ?int $excludeId = null): string
@@ -97,7 +99,7 @@ class ProjectService
 
         foreach ($galleryImages as $image) {
             if ($image instanceof UploadedFile) {
-                $path = $image->store('projects/gallery', 'public');
+                $path = $this->images->store($image, $this->imageDir($project));
                 $project->images()->create([
                     'image_path' => $path,
                     'sort_order' => ++$sortOrder,
@@ -111,7 +113,7 @@ class ProjectService
         $images = $project->images()->whereIn('id', $imageIds)->get();
 
         foreach ($images as $image) {
-            Storage::disk('public')->delete($image->image_path);
+            $this->images->delete($image->image_path);
             $image->delete();
         }
     }

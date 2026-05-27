@@ -132,7 +132,11 @@
                             <input type="file" id="profile_image" wire:model="profile_image" class="hidden" accept="image/jpg,image/jpeg,image/png,image/webp">
                         </div>
                         @error('profile_image') <p class="text-sm text-red-400">{{ $message }}</p> @enderror
-                        <p class="text-xs text-gray-500">JPG, PNG or WebP. Max 2MB.</p>
+                        <p class="text-xs text-gray-500">JPG, PNG or WebP. Max 8MB.</p>
+                        <div wire:loading wire:target="profile_image" class="text-xs text-primary-light">Optimizing image…</div>
+                        @if ($imageInfo)
+                            <x-admin.image-optimization-bar :original="$imageInfo['original']" :compressed="$imageInfo['compressed']" />
+                        @endif
                     </div>
                 </div>
             </div>
@@ -141,7 +145,9 @@
         {{-- Save Button --}}
         <div class="mt-6 flex justify-end">
             <button type="submit"
-                    class="bg-primary hover:bg-primary-hover text-white font-medium rounded-lg px-6 py-2.5 transition-colors flex items-center gap-2">
+                    @disabled($optimizing)
+                    wire:loading.attr="disabled" wire:target="profile_image,save"
+                    class="bg-primary hover:bg-primary-hover text-white font-medium rounded-lg px-6 py-2.5 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                 <span wire:loading.remove wire:target="save">Save Profile</span>
                 <span wire:loading wire:target="save" class="flex items-center gap-2">
                     <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>

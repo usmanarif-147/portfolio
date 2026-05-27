@@ -118,6 +118,12 @@
                         @endif
 
                         @error('coverImage') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+                        <div wire:loading wire:target="coverImage" class="mt-2 text-xs text-primary-light">Optimizing image…</div>
+                        @if ($coverInfo)
+                            <div class="mt-2">
+                                <x-admin.image-optimization-bar label="Cover" :original="$coverInfo['original']" :compressed="$coverInfo['compressed']" />
+                            </div>
+                        @endif
                     </div>
 
                     {{-- Gallery Images --}}
@@ -125,13 +131,15 @@
                         $keptExistingCount = count($existingImages) - count(array_unique($removedImageIds));
                         $totalSelected = $keptExistingCount + count($galleryImages);
                         $remainingSlots = max(0, 8 - $totalSelected);
+                        $galleryOriginal = array_sum(array_column($galleryInfo, 'original'));
+                        $galleryCompressed = array_sum(array_column($galleryInfo, 'compressed'));
                     @endphp
                     <div>
                         <div class="flex items-center justify-between mb-1.5">
                             <label class="block text-sm font-medium text-gray-300">Gallery Images</label>
                             <span class="text-xs font-mono {{ $totalSelected > 8 ? 'text-red-400' : 'text-gray-500' }}">{{ $totalSelected }} / 8</span>
                         </div>
-                        <p class="text-xs text-gray-500 mb-3">Up to 8 images. JPG, PNG or WebP, max 2&nbsp;MB each.</p>
+                        <p class="text-xs text-gray-500 mb-3">Up to 8 images. JPG, PNG or WebP, max 8&nbsp;MB each.</p>
 
                         {{-- Existing gallery images --}}
                         @if (count($existingImages) > 0)
@@ -171,6 +179,14 @@
                         @endif
                         @error('galleryImages') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
                         @error('galleryImages.*') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+                        <div wire:loading wire:target="galleryImages" class="mt-2 text-xs text-primary-light">Optimizing images…</div>
+                        @if (! empty($galleryInfo))
+                            <div class="mt-2">
+                                <x-admin.image-optimization-bar
+                                    :label="count($galleryInfo).' '.\Illuminate\Support\Str::plural('image', count($galleryInfo))"
+                                    :original="$galleryOriginal" :compressed="$galleryCompressed" />
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -238,7 +254,9 @@
         {{-- Actions --}}
         <div class="mt-6 flex items-center gap-3">
             <button type="submit"
-                    class="bg-primary hover:bg-primary-hover text-white font-medium rounded-lg px-6 py-2.5 transition-colors flex items-center gap-2">
+                    @disabled($optimizing)
+                    wire:loading.attr="disabled" wire:target="coverImage,galleryImages,save"
+                    class="bg-primary hover:bg-primary-hover text-white font-medium rounded-lg px-6 py-2.5 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
                 <span wire:loading.remove wire:target="save">{{ $project ? 'Update Project' : 'Save Project' }}</span>
                 <span wire:loading wire:target="save" class="flex items-center gap-2">
                     <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>

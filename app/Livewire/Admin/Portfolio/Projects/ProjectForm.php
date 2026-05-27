@@ -3,6 +3,7 @@
 namespace App\Livewire\Admin\Portfolio\Projects;
 
 use App\Models\Project\Project;
+use App\Services\ImageUploadService;
 use App\Services\ProjectService;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -49,6 +50,13 @@ class ProjectForm extends Component
     public array $existingImages = [];
 
     public array $removedImageIds = [];
+
+    // Optimization state (before/after sizes + Save gating)
+    public bool $optimizing = false;
+
+    public ?array $coverInfo = null;
+
+    public array $galleryInfo = [];
 
     public function mount(?Project $project = null): void
     {
@@ -98,11 +106,45 @@ class ProjectForm extends Component
         array_splice($this->tech_stack, $index, 1);
     }
 
+    public function updatedCoverImage(): void
+    {
+        $this->coverInfo = null;
+
+        if (! $this->coverImage) {
+            return;
+        }
+
+        $this->validate(['coverImage' => 'image|max:8192|mimes:jpg,jpeg,png,webp']);
+
+        $this->optimizing = true;
+        $this->coverInfo = app(ImageUploadService::class)->sizeInfo($this->coverImage);
+        $this->optimizing = false;
+    }
+
+    public function updatedGalleryImages(): void
+    {
+        $this->galleryInfo = [];
+
+        if (empty($this->galleryImages)) {
+            return;
+        }
+
+        $this->validate(['galleryImages.*' => 'image|max:8192|mimes:jpg,jpeg,png,webp']);
+
+        $this->optimizing = true;
+        $service = app(ImageUploadService::class);
+        foreach ($this->galleryImages as $image) {
+            $this->galleryInfo[] = $service->sizeInfo($image);
+        }
+        $this->optimizing = false;
+    }
+
     public function removeCoverImage(): void
     {
         $this->coverImage = null;
         $this->existingCoverImage = null;
         $this->removeCover = true;
+        $this->coverInfo = null;
     }
 
     public function removeExistingImage(int $id): void
@@ -116,6 +158,7 @@ class ProjectForm extends Component
     public function removeGalleryImage(int $index): void
     {
         array_splice($this->galleryImages, $index, 1);
+        array_splice($this->galleryInfo, $index, 1);
     }
 
     public function save(ProjectService $service): void
@@ -140,9 +183,9 @@ class ProjectForm extends Component
             'sort_order' => 'integer|min:0',
             'is_active' => 'boolean',
             'completed_at' => 'nullable|date',
-            'coverImage' => 'nullable|image|max:2048|mimes:jpg,jpeg,png,webp',
+            'coverImage' => 'nullable|image|max:8192|mimes:jpg,jpeg,png,webp',
             'galleryImages' => 'array|max:8',
-            'galleryImages.*' => 'image|max:2048|mimes:jpg,jpeg,png,webp',
+            'galleryImages.*' => 'image|max:8192|mimes:jpg,jpeg,png,webp',
         ]);
 
         $projectData = collect($validated)->except(['coverImage', 'galleryImages'])->toArray();

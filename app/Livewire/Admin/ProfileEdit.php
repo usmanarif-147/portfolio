@@ -3,7 +3,7 @@
 namespace App\Livewire\Admin;
 
 use App\Models\Profile;
-use Illuminate\Support\Facades\Storage;
+use App\Services\ImageUploadService;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithFileUploads;
@@ -35,6 +35,13 @@ class ProfileEdit extends Component
 
     public string $availability_status = '';
 
+    // Profile photo box (shown small) + optimization state
+    private const PHOTO_MAX_DIMENSION = 800;
+
+    public bool $optimizing = false;
+
+    public ?array $imageInfo = null;
+
     public function mount(): void
     {
         $profile = auth()->user()->profile;
@@ -53,10 +60,25 @@ class ProfileEdit extends Component
         }
     }
 
-    public function removeImage(): void
+    public function updatedProfileImage(): void
+    {
+        $this->imageInfo = null;
+
+        if (! $this->profile_image) {
+            return;
+        }
+
+        $this->validate(['profile_image' => 'image|max:8192|mimes:jpg,jpeg,png,webp']);
+
+        $this->optimizing = true;
+        $this->imageInfo = app(ImageUploadService::class)->sizeInfo($this->profile_image, self::PHOTO_MAX_DIMENSION);
+        $this->optimizing = false;
+    }
+
+    public function removeImage(ImageUploadService $images): void
     {
         if ($this->existing_image) {
-            Storage::disk('public')->delete($this->existing_image);
+            $images->delete($this->existing_image);
             $profile = Profile::find($this->profileId);
             if ($profile) {
                 $profile->update(['profile_image' => null]);
@@ -64,14 +86,15 @@ class ProfileEdit extends Component
             $this->existing_image = null;
         }
         $this->profile_image = null;
+        $this->imageInfo = null;
     }
 
-    public function save(): void
+    public function save(ImageUploadService $images): void
     {
         $validated = $this->validate([
             'tagline' => 'nullable|string|max:255',
             'bio' => 'nullable|string|max:430',
-            'profile_image' => 'nullable|image|max:2048|mimes:jpg,jpeg,png,webp',
+            'profile_image' => 'nullable|image|max:8192|mimes:jpg,jpeg,png,webp',
             'secondary_email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:50',
             'location' => 'nullable|string|max:255',
@@ -83,12 +106,11 @@ class ProfileEdit extends Component
         $data = collect($validated)->except('profile_image')->toArray();
 
         if ($this->profile_image) {
-            if ($this->existing_image) {
-                Storage::disk('public')->delete($this->existing_image);
-            }
-            $data['profile_image'] = $this->profile_image->store('profile-images', 'public');
+            $images->delete($this->existing_image);
+            $data['profile_image'] = $images->store($this->profile_image, 'profile', self::PHOTO_MAX_DIMENSION);
             $this->existing_image = $data['profile_image'];
             $this->profile_image = null;
+            $this->imageInfo = null;
         }
 
         $profile = Profile::updateOrCreate(
