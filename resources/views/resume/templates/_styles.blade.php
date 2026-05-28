@@ -138,22 +138,18 @@
         margin-bottom: 9px;
     }
     .resume-paper .project .project-head {
-        display: table;
-        width: 100%;
+        /* Inline so the URL sits immediately after the title with a small gap,
+           instead of being pushed flush-right by a table layout. */
     }
     .resume-paper .project .title {
-        display: table-cell;
-        width: 100%;
         font-size: 11px;
         font-weight: 700;
         color: #111827;
     }
     .resume-paper .project .url {
-        display: table-cell;
-        text-align: right;
         font-size: 11px;
         color: #1d4ed8;
-        white-space: nowrap;
+        margin-left: 10px;
     }
     .resume-paper .project .desc {
         font-size: 11px;

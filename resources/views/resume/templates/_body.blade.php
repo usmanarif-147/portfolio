@@ -2,27 +2,14 @@
     $interactive = $interactive ?? false;
     $hasHeader = !empty($header['name'] ?? '') || !empty($header['tagline'] ?? '') || !empty($header['email'] ?? '') || !empty($header['phone'] ?? '');
 
-    // "2022-08" -> "Aug 2022". Non Y-m values pass through unchanged.
+    // "2022-08-28" / "2022-08" / "2022" -> "Aug 2022". Unparsable values pass through unchanged.
     $formatDate = function ($v) {
         $v = trim((string) $v);
         if ($v === '') {
             return '';
         }
         try {
-            return \Carbon\Carbon::createFromFormat('Y-m', $v)->format('M Y');
-        } catch (\Throwable) {
-            return $v;
-        }
-    };
-
-    // "2016-09" -> "2016" (year only, used for Education).
-    $formatYear = function ($v) {
-        $v = trim((string) $v);
-        if ($v === '') {
-            return '';
-        }
-        try {
-            return \Carbon\Carbon::createFromFormat('Y-m', $v)->format('Y');
+            return \Carbon\Carbon::parse($v)->format('M Y');
         } catch (\Throwable) {
             return $v;
         }
@@ -84,12 +71,19 @@
         @include('resume.templates._section_title', ['title' => 'Professional Experience', 'section' => 'work', 'hasData' => count($experiences) > 0, 'interactive' => $interactive])
         @if (count($experiences) > 0)
             @foreach ($experiences as $job)
+                @php
+                    $jobStart = $formatDate($job['start'] ?? '');
+                    $jobEnd = $formatDate($job['end'] ?? '');
+                    // Show "Present" when explicitly marked current OR when end is missing but there is a start.
+                    $jobRangeEnd = (($job['is_current'] ?? false) || $jobEnd === '') && $jobStart !== ''
+                        ? 'Present'
+                        : $jobEnd;
+                    $jobSeparator = $jobStart !== '' && $jobRangeEnd !== '' ? ' – ' : '';
+                @endphp
                 <div class="job">
                     <div class="job-head">
                         <span class="company">{{ $job['company'] ?? '' }}</span>
-                        <span class="dates">
-                            {{ $formatDate($job['start'] ?? '') }}{{ ($job['start'] ?? '') || ($job['end'] ?? '') ? ' – ' : '' }}{{ ($job['is_current'] ?? false) ? 'Present' : $formatDate($job['end'] ?? '') }}
-                        </span>
+                        <span class="dates">{{ $jobStart }}{{ $jobSeparator }}{{ $jobRangeEnd }}</span>
                     </div>
                     @if (!empty($job['role'] ?? ''))
                         <div class="role">{{ $job['role'] }}</div>
@@ -159,10 +153,15 @@
         @include('resume.templates._section_title', ['title' => 'Education', 'section' => 'education', 'hasData' => count($educations) > 0, 'interactive' => $interactive])
         @if (count($educations) > 0)
             @foreach ($educations as $e)
+                @php
+                    $eduStart = $formatDate($e['start'] ?? '');
+                    $eduEnd = $formatDate($e['end'] ?? '');
+                    $eduSeparator = $eduStart !== '' && $eduEnd !== '' ? ' – ' : '';
+                @endphp
                 <div class="education-entry">
                     <div class="edu-head">
                         <span class="degree">{{ $e['degree'] ?? '' }}</span>
-                        <span class="dates">{{ $formatYear($e['start'] ?? '') }}{{ ($e['start'] ?? '') || ($e['end'] ?? '') ? ' – ' : '' }}{{ $formatYear($e['end'] ?? '') }}</span>
+                        <span class="dates">{{ $eduStart }}{{ $eduSeparator }}{{ $eduEnd }}</span>
                     </div>
                     @if (!empty($e['institution'] ?? ''))
                         <div class="institution">{{ $e['institution'] }}</div>
