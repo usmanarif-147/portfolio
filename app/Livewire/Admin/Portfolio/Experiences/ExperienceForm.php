@@ -32,6 +32,8 @@ class ExperienceForm extends Component
 
     public bool $is_active = true;
 
+    public bool $is_for_resume = false;
+
     public array $responsibilities = [];
 
     public function mount(?Experience $experience = null): void
@@ -46,6 +48,7 @@ class ExperienceForm extends Component
             $this->description = $experience->description ?? '';
             $this->sort_order = $experience->sort_order ?? 0;
             $this->is_active = $experience->is_active;
+            $this->is_for_resume = $experience->is_for_resume;
 
             $this->responsibilities = $experience->responsibilities()
                 ->orderBy('sort_order')
@@ -94,6 +97,18 @@ class ExperienceForm extends Component
     {
         $bulletLimit = $this->responsibilityCharLimit();
 
+        // Cap-3 guard: turning is_for_resume on must not exceed 3 (excluding self on edit).
+        if ($this->is_for_resume) {
+            $onCount = Experience::query()->forResume()
+                ->when($this->experience, fn ($q) => $q->where('id', '!=', $this->experience->id))
+                ->count();
+            if ($onCount >= 3) {
+                $this->addError('is_for_resume', 'Resume already has 3 experiences. Turn one off first.');
+
+                return;
+            }
+        }
+
         $validated = $this->validate([
             'role' => 'required|string|max:255',
             'company' => 'required|string|max:255',
@@ -103,6 +118,7 @@ class ExperienceForm extends Component
             'description' => 'nullable|string|max:500',
             'sort_order' => 'integer|min:0',
             'is_active' => 'boolean',
+            'is_for_resume' => 'boolean',
             'responsibilities' => 'array|max:'.self::MAX_RESPONSIBILITIES,
             'responsibilities.*.description' => ['required', 'string', function ($attribute, $value, $fail) use ($bulletLimit) {
                 if (mb_strlen($value) > $bulletLimit) {

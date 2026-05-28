@@ -32,6 +32,8 @@ class ProjectForm extends Component
 
     public bool $is_featured = false;
 
+    public bool $is_for_resume = false;
+
     public int $sort_order = 0;
 
     public bool $is_active = true;
@@ -69,6 +71,7 @@ class ProjectForm extends Component
             $this->demo_url = $project->demo_url ?? '';
             $this->github_url = $project->github_url ?? '';
             $this->is_featured = $project->is_featured;
+            $this->is_for_resume = $project->is_for_resume;
             $this->sort_order = $project->sort_order ?? 0;
             $this->is_active = $project->is_active;
             $this->completed_at = $project->completed_at?->format('Y-m-d');
@@ -172,6 +175,18 @@ class ProjectForm extends Component
             return;
         }
 
+        // Cap-3 guard: turning is_for_resume on must not exceed 3 (excluding self on edit).
+        if ($this->is_for_resume) {
+            $onCount = Project::query()->forResume()
+                ->when($this->project, fn ($q) => $q->where('id', '!=', $this->project->id))
+                ->count();
+            if ($onCount >= 3) {
+                $this->addError('is_for_resume', 'Resume already has 3 projects. Turn one off first.');
+
+                return;
+            }
+        }
+
         $validated = $this->validate([
             'title' => 'required|string|max:200',
             'short_description' => 'required|string|max:190',
@@ -180,6 +195,7 @@ class ProjectForm extends Component
             'demo_url' => 'nullable|url|max:255',
             'github_url' => 'nullable|url|max:255',
             'is_featured' => 'boolean',
+            'is_for_resume' => 'boolean',
             'sort_order' => 'integer|min:0',
             'is_active' => 'boolean',
             'completed_at' => 'nullable|date',

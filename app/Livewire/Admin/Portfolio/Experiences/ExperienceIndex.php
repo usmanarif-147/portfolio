@@ -36,6 +36,19 @@ class ExperienceIndex extends Component
         session()->flash('success', 'Experience deleted successfully.');
     }
 
+    public function toggleForResume(int $id): void
+    {
+        $experience = Experience::findOrFail($id);
+
+        if (! $experience->is_for_resume && Experience::query()->forResume()->count() >= 3) {
+            session()->flash('error', 'Resume already has 3 experiences. Turn one off first.');
+
+            return;
+        }
+
+        $experience->update(['is_for_resume' => ! $experience->is_for_resume]);
+    }
+
     public function render()
     {
         $query = Experience::query()->ordered();

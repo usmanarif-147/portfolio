@@ -138,6 +138,18 @@
                             <span class="ml-3 text-sm font-medium text-gray-400">Active</span>
                         </label>
                     </div>
+
+                    <div>
+                        <div class="flex items-center">
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" wire:model="is_for_resume" class="sr-only peer">
+                                <div class="w-11 h-6 bg-dark-600 peer-focus:ring-2 peer-focus:ring-primary rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                <span class="ml-3 text-sm font-medium text-gray-400">Include in resume</span>
+                            </label>
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">Resume can hold up to 3 experiences.</p>
+                        @error('is_for_resume') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+                    </div>
                 </div>
             </div>
         </div>

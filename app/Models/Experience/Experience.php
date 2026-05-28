@@ -17,6 +17,7 @@ class Experience extends Model
         'description',
         'sort_order',
         'is_active',
+        'is_for_resume',
     ];
 
     protected function casts(): array
@@ -26,6 +27,7 @@ class Experience extends Model
             'end_date' => 'date',
             'is_current' => 'boolean',
             'is_active' => 'boolean',
+            'is_for_resume' => 'boolean',
         ];
     }
 
@@ -42,5 +44,10 @@ class Experience extends Model
     public function scopeOrdered(Builder $query): Builder
     {
         return $query->orderBy('sort_order');
+    }
+
+    public function scopeForResume(Builder $query): Builder
+    {
+        return $query->where('is_for_resume', true);
     }
 }

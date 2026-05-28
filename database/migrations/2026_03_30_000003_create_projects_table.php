@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('demo_url', 255)->nullable();
             $table->string('github_url', 255)->nullable();
             $table->boolean('is_featured')->default(false);
+            $table->boolean('is_for_resume')->default(false);
             $table->unsignedInteger('sort_order')->default(0);
             $table->boolean('is_active')->default(true);
             $table->date('completed_at')->nullable();

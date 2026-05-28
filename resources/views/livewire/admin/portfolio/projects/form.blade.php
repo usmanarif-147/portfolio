@@ -235,6 +235,18 @@
                     </div>
 
                     <div>
+                        <div class="flex items-center">
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" wire:model="is_for_resume" class="sr-only peer">
+                                <div class="w-11 h-6 bg-dark-600 peer-focus:ring-2 peer-focus:ring-primary rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                <span class="ml-3 text-sm font-medium text-gray-400">Include in resume</span>
+                            </label>
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">Resume can hold up to 3 projects.</p>
+                        @error('is_for_resume') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
                         <label for="sort_order" class="block text-sm font-medium text-gray-300 mb-1.5">Sort Order</label>
                         <input type="number" id="sort_order" wire:model="sort_order" min="0"
                                class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent">

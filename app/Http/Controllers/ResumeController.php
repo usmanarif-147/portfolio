@@ -2,29 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\ResumeDataService;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Str;
 
 class ResumeController extends Controller
 {
     /**
      * Public resume download. Renders the same template the admin Resume Builder
-     * uses (resume.templates.builder).
-     *
-     * The Resume Builder is not persisted yet, so this currently produces an EMPTY
-     * resume (for testing). Once the builder data is stored, read it here and pass
-     * the real header/profile/experiences/projects/skillGroups/educations.
+     * uses, sourcing data from ResumeDataService so the public PDF stays in sync
+     * with whatever the owner has marked is_for_resume in the Portfolio admin.
      */
-    public function download()
+    public function download(ResumeDataService $resumeData)
     {
-        $pdf = Pdf::loadView('resume.templates.builder', [
-            'header' => [],
-            'profile' => '',
-            'experiences' => [],
-            'projects' => [],
-            'skillGroups' => [],
-            'educations' => [],
-        ])->setPaper('A4', 'portrait');
+        $data = $resumeData->gather();
 
-        return $pdf->download('resume.pdf');
+        $pdf = Pdf::loadView('resume.templates.builder', $data)->setPaper('A4', 'portrait');
+
+        $name = trim((string) ($data['header']['name'] ?? ''));
+        $filename = $name !== '' ? Str::slug($name).'.pdf' : 'resume.pdf';
+
+        return $pdf->download($filename);
     }
 }

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('description', 500)->nullable();
             $table->unsignedInteger('sort_order')->default(0);
             $table->boolean('is_active')->default(true);
+            $table->boolean('is_for_resume')->default(false);
             $table->timestamps();
         });
     }

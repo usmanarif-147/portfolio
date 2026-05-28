@@ -44,6 +44,19 @@ class ProjectIndex extends Component
         session()->flash('success', 'Project deleted successfully.');
     }
 
+    public function toggleForResume(int $id): void
+    {
+        $project = Project::findOrFail($id);
+
+        if (! $project->is_for_resume && Project::query()->forResume()->count() >= 3) {
+            session()->flash('error', 'Resume already has 3 projects. Turn one off first.');
+
+            return;
+        }
+
+        $project->update(['is_for_resume' => ! $project->is_for_resume]);
+    }
+
     public function render()
     {
         $query = Project::query()->ordered();
