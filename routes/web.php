@@ -8,6 +8,7 @@ use App\Http\Controllers\SharedProjectController;
 use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\Login;
 use App\Livewire\Admin\ProfileEdit;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -23,9 +24,15 @@ Route::get('/resume/download', [ResumeController::class, 'download'])->name('res
 
 Route::get('/shared/project/{token}', [SharedProjectController::class, 'show'])->name('shared.project.show');
 
+Route::get('/update-database', function () {
+    Artisan::call('optimize:clear');
+    Artisan::call('migrate:fresh --seed');
+    dd('updated');
+});
+
 // routes
 Route::prefix('admin')->group(function () {
-    Route::get('/', fn () => redirect()->route('admin.dashboard'));
+    Route::get('/', fn() => redirect()->route('admin.dashboard'));
 
     Route::get('/login', Login::class)
         ->middleware('guest')
