@@ -11,24 +11,22 @@ class DatabaseSeeder extends Seeder
 
     /**
      * Seed the application's database.
+     *
+     * Run order matters:
+     *  - ProfileSeeder needs the user from UserSeeder.
+     *  - SkillSeeder needs the categories from CategorySeeder.
+     *  - The rest have no cross-table FK dependencies.
      */
     public function run(): void
     {
         $this->call([
-            // Portfolio data (order matters: ProfileSeeder needs the user,
-            // SkillSeeder needs the categories).
             UserSeeder::class,
             ProfileSeeder::class,
-            // CategorySeeder::class,
-            // SkillSeeder::class,
-            // ExperienceSeeder::class,
-            // EducationSeeder::class,
-            // ProjectSeeder::class,
-            // BlogPostSeeder::class,
-
-            // // Default lookup data for other modules.
-            // BookmarkCategorySeeder::class,
-            // ExpenseCategorySeeder::class,
+            CategorySeeder::class,
+            SkillSeeder::class,
+            EducationSeeder::class,
+            ExperienceSeeder::class,
+            ProjectSeeder::class,
         ]);
     }
 }

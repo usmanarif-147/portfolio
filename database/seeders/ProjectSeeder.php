@@ -4,42 +4,67 @@ namespace Database\Seeders;
 
 use App\Models\Project\Project;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class ProjectSeeder extends Seeder
 {
+    /**
+     * Featured portfolio projects. cover_image is intentionally null on every row —
+     * the owner re-uploads project images via the admin UI after migrate-fresh.
+     */
     public function run(): void
     {
-        Project::create([
-            'title' => 'Autotheory',
-            'slug' => 'autotheory',
-            'short_description' => 'A comprehensive automotive theory learning platform with interactive quizzes, progress tracking, and adaptive learning paths.',
-            'description' => 'Built to help users prepare for driving theory exams efficiently. Features include mock tests, progress analytics, and spaced repetition.',
-            'tech_stack' => ['Laravel', 'Livewire', 'Tailwind CSS', 'MySQL'],
-            'is_featured' => true,
-            'sort_order' => 0,
-            'completed_at' => '2024-06-15',
-        ]);
+        $projects = [
+            [
+                'title' => 'RehabSuite — Multi-Tenant Physiotherapy SaaS Platform',
+                'short_description' => 'Built a real-time communication system with WebSocket chat and WebRTC voice/video calling using Laravel, Rust/Axum, Kafka, and LiveKit.',
+                'tech_stack' => ['Laravel 12', 'Rust/Axum', 'Kafka', 'PostgreSQL', 'Docker', 'Playwright'],
+                'demo_url' => 'https://facility.rehasaku.net/en-US',
+                'is_featured' => true,
+                'is_for_resume' => true,
+            ],
+            [
+                'title' => 'Autotheory — Multi-Vendor Auto Services Platform',
+                'short_description' => 'Developed a multi-role platform with vendor onboarding, booking management, Stripe Connect split payments, Redis caching, and FCM notifications.',
+                'tech_stack' => ['Laravel', 'Vue.js', 'Livewire', 'Redis', 'Stripe Connect', 'MySQL'],
+                'demo_url' => 'https://autotheory.com/',
+                'is_featured' => true,
+                'is_for_resume' => true,
+            ],
+            [
+                'title' => 'Workforce & Job Management System',
+                'short_description' => 'Built role-based job and employee management modules with real-time dashboards, performance tracking, and notification systems.',
+                'tech_stack' => ['Laravel 10', 'Livewire', 'Filament', 'Alpine.js', 'Bootstrap', 'MySQL'],
+                'demo_url' => 'https://thislinks.co.uk/',
+                'is_featured' => true,
+                'is_for_resume' => false,
+            ],
+            [
+                'title' => 'GoTap — NFC Smart Business-Card & Digital-Profile Platform',
+                'short_description' => 'A digital networking platform where people share their contact details with a tap. Users build rich digital profiles, link them to physical **NFC cards** and **QR codes**, capture lead',
+                'tech_stack' => ['Laravel 9', 'Livewire 2', 'MySQL 8', 'Alpine.js', 'Bootstrap'],
+                'demo_url' => 'https://gotaps.me/',
+                'is_featured' => true,
+                'is_for_resume' => true,
+            ],
+        ];
 
-        Project::create([
-            'title' => 'Workforce & Job Management System',
-            'slug' => 'workforce-job-management',
-            'short_description' => 'An enterprise workforce management platform for scheduling, job tracking, employee management, and reporting.',
-            'description' => 'Features real-time dashboards, automated notifications, role-based access control, and comprehensive reporting.',
-            'tech_stack' => ['Laravel', 'Filament', 'Alpine.js', 'REST API'],
-            'is_featured' => true,
-            'sort_order' => 1,
-            'completed_at' => '2024-01-20',
-        ]);
-
-        Project::create([
-            'title' => 'E-Commerce Analytics Dashboard',
-            'slug' => 'ecommerce-analytics',
-            'short_description' => 'Real-time analytics dashboard for e-commerce businesses with sales tracking, inventory management, and customer insights.',
-            'description' => 'A data-driven dashboard providing actionable insights for online stores.',
-            'tech_stack' => ['Laravel', 'Livewire', 'Chart.js', 'PostgreSQL', 'Redis'],
-            'is_featured' => false,
-            'sort_order' => 2,
-            'completed_at' => '2023-08-10',
-        ]);
+        foreach ($projects as $data) {
+            Project::create([
+                'title' => $data['title'],
+                'slug' => Str::slug($data['title']),
+                'short_description' => $data['short_description'],
+                'description' => null,
+                'cover_image' => null,
+                'tech_stack' => $data['tech_stack'],
+                'demo_url' => $data['demo_url'],
+                'github_url' => null,
+                'is_featured' => $data['is_featured'],
+                'is_for_resume' => $data['is_for_resume'],
+                'sort_order' => 0,
+                'is_active' => true,
+                'completed_at' => null,
+            ]);
+        }
     }
 }

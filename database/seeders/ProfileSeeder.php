@@ -12,13 +12,20 @@ class ProfileSeeder extends Seeder
     {
         $user = User::where('email', 'usmanarif.9219@gmail.com')->firstOrFail();
 
+        // profile_image is intentionally null — re-uploaded via the admin UI after migrate-fresh.
         Profile::create([
             'user_id' => $user->id,
             'tagline' => 'Full-Stack Developer',
-            'bio' => "I'm a dedicated Full-Stack Developer with 4+ years of professional experience in building robust web applications. My expertise lies in the Laravel ecosystem, where I leverage tools like Livewire, Filament, and Tailwind CSS to create seamless user experiences.\n\nI thrive on transforming complex business requirements into elegant, maintainable code. Whether it's architecting a new system from scratch or optimizing an existing application, I bring a problem-solving mindset and attention to detail.",
+            'bio' => 'Software Engineer with 5+ years of experience building scalable Laravel applications and REST APIs. Skilled in full stack development using Laravel, Vue.js, and Livewire, with experience in real-time systems, microservices, payment integrations, automated testing, and cloud deployments. Worked on SaaS, multi-vendor, enterprise, and real-time communication platforms.',
+            'profile_image' => null,
             'secondary_email' => 'usman@example.com',
+            'phone' => '03364238599',
             'location' => 'Lahore, Pakistan',
+            'linkedin_url' => 'https://www.linkedin.com/in/us-tech-nerd',
+            'github_url' => 'https://github.com/usmanarif-147',
             'availability_status' => 'Open to opportunities',
+            'timezone' => 'UTC',
+            'language' => 'en',
         ]);
     }
 }

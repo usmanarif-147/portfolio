@@ -8,48 +8,77 @@ use Illuminate\Database\Seeder;
 
 class ExperienceSeeder extends Seeder
 {
+    /**
+     * Work history shown on the public timeline and (when is_for_resume=true)
+     * in the Resume Builder. All three experiences are currently flagged for the
+     * resume; the owner can flip them off via the admin toggle.
+     */
     public function run(): void
     {
-        $horizam = Experience::create([
-            'role' => 'Full-Stack Developer',
-            'company' => 'Horizam',
-            'start_date' => '2022-01-01',
-            'end_date' => null,
-            'is_current' => true,
-            'sort_order' => 0,
-        ]);
+        $experiences = [
+            [
+                'role' => 'Software Engineer (Full Stack)',
+                'company' => 'JSYS Tech',
+                'start_date' => '2025-08-28',
+                'end_date' => null,
+                'is_current' => false,
+                'responsibilities' => [
+                    'Working on a multi-tenant physiotherapy SaaS platform with real-time chat and WebRTC calling features.',
+                    'Developed JWT-authenticated WebSocket chat systems with message reactions, typing indicators, read receipts, and presence tracking.',
+                    'Integrated LiveKit for voice/video calling, call recording, and AI-based transcription workflows.',
+                    'Built backend services using Laravel and Rust/Axum within a Kafka-driven microservices architecture.',
+                    'Wrote Playwright end-to-end tests and contributed to Jenkins CI/CD workflows.',
+                ],
+            ],
+            [
+                'role' => 'Software Engineer (Full Stack)',
+                'company' => 'Horizam',
+                'start_date' => '2022-04-28',
+                'end_date' => '2025-07-28',
+                'is_current' => false,
+                'responsibilities' => [
+                    'Developed scalable Laravel applications and REST APIs for web and mobile platforms.',
+                    'Built multi-vendor systems with vendor onboarding, booking management, Stripe Connect payments, and FCM notifications.',
+                    'Designed database schemas, implemented Redis caching, and optimized complex SQL queries.',
+                    'Migrated legacy CodeIgniter applications to Laravel with complete database redesign.',
+                    'Introduced automated testing using Laravel Pest and improved code reliability across projects.',
+                ],
+            ],
+            [
+                'role' => 'Laravel Developer',
+                'company' => 'Softenica',
+                'start_date' => '2021-03-28',
+                'end_date' => '2022-07-28',
+                'is_current' => false,
+                'responsibilities' => [
+                    'Developed backend services and REST APIs for client projects using Laravel.',
+                    'Worked on admin panels, authentication systems, and CRUD-based business modules.',
+                    'Assisted in database optimization and integration of third-party APIs.',
+                    'Collaborated with frontend developers and participated in agile sprint workflows.',
+                ],
+            ],
+        ];
 
-        foreach ([
-            'Built and maintained multiple Laravel web applications with Livewire and Filament admin panels',
-            'Implemented REST APIs, payment integrations, and third-party service integrations',
-            'Optimized database queries and application performance for large-scale systems',
-        ] as $i => $desc) {
-            ExperienceResponsibility::create([
-                'experience_id' => $horizam->id,
-                'description' => $desc,
-                'sort_order' => $i,
+        foreach ($experiences as $data) {
+            $experience = Experience::create([
+                'role' => $data['role'],
+                'company' => $data['company'],
+                'start_date' => $data['start_date'],
+                'end_date' => $data['end_date'],
+                'is_current' => $data['is_current'],
+                'description' => '',
+                'sort_order' => 0,
+                'is_active' => true,
+                'is_for_resume' => true,
             ]);
-        }
 
-        $softenica = Experience::create([
-            'role' => 'Software Developer',
-            'company' => 'Softenica',
-            'start_date' => '2021-01-01',
-            'end_date' => '2022-01-01',
-            'is_current' => false,
-            'sort_order' => 1,
-        ]);
-
-        foreach ([
-            'Developed web applications using Laravel and Vue.js',
-            'Collaborated with cross-functional teams to deliver client projects on schedule',
-            'Participated in code reviews and implemented best practices for code quality',
-        ] as $i => $desc) {
-            ExperienceResponsibility::create([
-                'experience_id' => $softenica->id,
-                'description' => $desc,
-                'sort_order' => $i,
-            ]);
+            foreach ($data['responsibilities'] as $i => $bullet) {
+                ExperienceResponsibility::create([
+                    'experience_id' => $experience->id,
+                    'description' => $bullet,
+                    'sort_order' => $i,
+                ]);
+            }
         }
     }
 }

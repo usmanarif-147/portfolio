@@ -8,15 +8,30 @@ use Illuminate\Support\Str;
 
 class CategorySeeder extends Seeder
 {
+    /**
+     * Skill categories shown on the public portfolio's "Skills & Technologies"
+     * section. Order here matches the order owner wants them rendered.
+     *
+     * Slug is set explicitly — Category::saving() would normally auto-derive
+     * it, but DatabaseSeeder uses WithoutModelEvents, which mutes that hook
+     * during seeding.
+     */
     public function run(): void
     {
-        // Categories (used to group Skills in the Skills & Tech section)
         foreach ([
-            ['name' => 'Frontend', 'sort_order' => 0],
-            ['name' => 'Backend', 'sort_order' => 1],
-            ['name' => 'Database & Tools', 'sort_order' => 2],
-        ] as $cat) {
-            Category::create($cat + ['slug' => Str::slug($cat['name'])]);
+            'Backend',
+            'Frontend',
+            'Real-Time',
+            'Databases',
+            'Architecture',
+            'DevOps',
+            'Testing & Tools',
+        ] as $name) {
+            Category::create([
+                'name' => $name,
+                'slug' => Str::slug($name),
+                'sort_order' => 0,
+            ]);
         }
     }
 }
