@@ -1,0 +1,14 @@
+# Hostinger shared-hosting fix.
+#
+# The Hostinger plan for this site locks the document root to `public_html/`,
+# but Laravel's real entry point is `public_html/public/index.php`. This
+# .htaccess routes every request through the `public/` directory, where
+# `public/.htaccess` then takes over and runs the normal Laravel front
+# controller.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Send everything to public/ — the existing public/.htaccess handles the
+    # rest (routing to index.php for non-file requests).
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
