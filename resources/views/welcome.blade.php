@@ -23,6 +23,10 @@
                         <a href="#blog" class="text-sm text-gray-500 hover:text-white transition-colors duration-200">Blog</a>
                     @endif
                     <a href="#contact" class="text-sm text-gray-500 hover:text-white transition-colors duration-200">Contact</a>
+                    <a href="{{ route('resume.download') }}"
+                       class="px-4 py-2 bg-accent text-black font-bold text-xs uppercase tracking-widest rounded-lg hover:bg-accent-light transition-colors duration-200">
+                        Resume
+                    </a>
                 </div>
 
                 <button @click="open = !open" class="md:hidden text-gray-400 hover:text-white transition-colors">
@@ -51,6 +55,10 @@
                     <a @click="open = false" href="#blog" class="block text-gray-400 hover:text-white transition-colors">Blog</a>
                 @endif
                 <a @click="open = false" href="#contact" class="block text-gray-400 hover:text-white transition-colors">Contact</a>
+                <a href="{{ route('resume.download') }}"
+                   class="inline-block px-4 py-2 bg-accent text-black font-bold text-xs uppercase tracking-widest rounded-lg hover:bg-accent-light transition-colors">
+                    Resume
+                </a>
             </div>
         </div>
     </nav>
@@ -72,16 +80,16 @@
                         {{ Str::before($profile->bio ?? '', "\n") }}
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start animate-fade-in-up" style="animation-delay: 400ms">
+                        <a href="{{ route('resume.download') }}"
+                           class="px-8 py-3.5 bg-accent text-black font-extrabold text-sm uppercase tracking-widest rounded-xl hover:bg-accent-light transition-all duration-300 text-center">
+                            Download Resume
+                        </a>
                         @if($projects->isNotEmpty())
                             <a href="#projects"
-                               class="px-8 py-3.5 bg-accent text-black font-extrabold text-sm uppercase tracking-widest rounded-xl hover:bg-accent-light transition-all duration-300 text-center">
+                               class="px-8 py-3.5 border border-accent/30 text-accent hover:bg-accent/10 font-semibold text-sm rounded-xl transition-all duration-300 text-center">
                                 View Projects
                             </a>
                         @endif
-                        <a href="#contact"
-                           class="px-8 py-3.5 border border-accent/30 text-accent hover:bg-accent/10 font-semibold text-sm rounded-xl transition-all duration-300 text-center">
-                            Get in Touch
-                        </a>
                     </div>
                 </div>
                 <div class="flex-shrink-0 animate-float">
@@ -392,5 +400,7 @@
             </div>
         </div>
     </footer>
+
+    <x-project-modal />
 
 </x-layouts.app>

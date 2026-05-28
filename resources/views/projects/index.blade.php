@@ -55,4 +55,6 @@
     </main>
 
     <x-public.footer />
+
+    <x-project-modal />
 </x-layouts.app>

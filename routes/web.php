@@ -3,6 +3,7 @@
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\PortfolioController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ResumeController;
 use App\Http\Controllers\SharedProjectController;
 use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\Login;
@@ -17,6 +18,8 @@ Route::get('/blogs/{slug}', [BlogController::class, 'show'])->name('blogs.show')
 
 Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
 Route::get('/projects/{slug}', [ProjectController::class, 'show'])->name('projects.show');
+
+Route::get('/resume/download', [ResumeController::class, 'download'])->name('resume.download');
 
 Route::get('/shared/project/{token}', [SharedProjectController::class, 'show'])->name('shared.project.show');
 
