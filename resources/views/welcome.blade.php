@@ -159,7 +159,7 @@
                             <div class="{{ $index % 2 === 0 ? 'md:w-1/2 md:pr-12' : 'md:w-1/2 md:ml-auto md:pl-12' }}">
                                 <div class="bg-dark-800 border border-white/[0.04] rounded-2xl p-6 hover:border-accent/20 transition-all duration-300">
                                     <span class="text-accent font-mono text-sm">
-                                        {{ $exp->start_date->format('Y') }} — {{ $exp->is_current ? 'Present' : $exp->end_date->format('Y') }}
+                                        {{ $exp->start_date->format('Y') }} — {{ $exp->is_current ? 'Present' : ($exp->end_date?->format('Y') ?? 'Present') }}
                                     </span>
                                     <h3 class="text-xl font-bold text-white mt-1">{{ $exp->role }}</h3>
                                     <p class="text-accent-light font-medium mb-3">{{ $exp->company }}</p>
