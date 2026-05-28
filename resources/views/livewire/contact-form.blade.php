@@ -11,6 +11,12 @@
         </div>
     @else
         <form wire:submit="submit" class="space-y-6">
+            {{-- Honeypot — humans never see this; bots fill it and get rejected --}}
+            <div class="hidden" aria-hidden="true">
+                <label for="website">Website</label>
+                <input type="text" id="website" wire:model="website" tabindex="-1" autocomplete="off">
+            </div>
+
             {{-- Name --}}
             <div>
                 <label for="name" class="block text-sm font-medium text-gray-300 mb-2">Name</label>
@@ -55,6 +61,11 @@
                     <p class="mt-1 text-sm text-red-400">{{ $message }}</p>
                 @enderror
             </div>
+
+            {{-- Generic form-level error (honeypot / time trap / rate limit) --}}
+            @error('form')
+                <p class="text-sm text-red-400">{{ $message }}</p>
+            @enderror
 
             {{-- Submit --}}
             <button

@@ -3,17 +3,35 @@
 namespace App\Livewire;
 
 use App\Services\ContactService;
+use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Component;
 
 class ContactForm extends Component
 {
+    private const GENERIC_ERROR = 'Something went wrong. Please try again later.';
+
+    private const RATE_LIMIT_MAX = 3;
+
+    private const RATE_LIMIT_DECAY = 3600;
+
+    private const MIN_FILL_SECONDS = 3;
+
     public string $name = '';
 
     public string $email = '';
 
     public string $message = '';
 
+    public string $website = '';
+
+    public int $loadedAt = 0;
+
     public bool $submitted = false;
+
+    public function mount(): void
+    {
+        $this->loadedAt = now()->timestamp;
+    }
 
     protected function rules(): array
     {
@@ -32,6 +50,28 @@ class ContactForm extends Component
     public function submit(ContactService $service): void
     {
         $this->validate();
+
+        if ($this->website !== '') {
+            $this->addError('form', self::GENERIC_ERROR);
+
+            return;
+        }
+
+        if (now()->timestamp - $this->loadedAt < self::MIN_FILL_SECONDS) {
+            $this->addError('form', self::GENERIC_ERROR);
+
+            return;
+        }
+
+        $key = 'contact-form:'.request()->ip();
+
+        if (RateLimiter::tooManyAttempts($key, self::RATE_LIMIT_MAX)) {
+            $this->addError('form', self::GENERIC_ERROR);
+
+            return;
+        }
+
+        RateLimiter::hit($key, self::RATE_LIMIT_DECAY);
 
         $service->store([
             'name' => $this->name,
