@@ -22,7 +22,17 @@ class Profile extends Model
         'youtube_url',
         'timezone',
         'language',
+        'visitors_count',
+        'resume_downloads_count',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'visitors_count' => 'integer',
+            'resume_downloads_count' => 'integer',
+        ];
+    }
 
     public function user(): BelongsTo
     {

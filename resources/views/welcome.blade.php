@@ -25,7 +25,7 @@
                     <a href="#contact" class="text-sm text-gray-500 hover:text-white transition-colors duration-200">Contact</a>
                     <a href="{{ route('resume.download') }}"
                        class="px-4 py-2 bg-accent text-black font-bold text-xs uppercase tracking-widest rounded-lg hover:bg-accent-light transition-colors duration-200">
-                        Resume
+                        Download Resume
                     </a>
                 </div>
 
@@ -57,7 +57,7 @@
                 <a @click="open = false" href="#contact" class="block text-gray-400 hover:text-white transition-colors">Contact</a>
                 <a href="{{ route('resume.download') }}"
                    class="inline-block px-4 py-2 bg-accent text-black font-bold text-xs uppercase tracking-widest rounded-lg hover:bg-accent-light transition-colors">
-                    Resume
+                    Download Resume
                 </a>
             </div>
         </div>

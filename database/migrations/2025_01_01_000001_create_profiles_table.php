@@ -24,6 +24,9 @@ return new class extends Migration
             $table->string('availability_status', 100)->nullable();
             $table->string('timezone', 100)->nullable()->default('UTC');
             $table->string('language', 10)->nullable()->default('en');
+            // Simple admin-dashboard counters; deduped at write-time via cookies.
+            $table->unsignedInteger('visitors_count')->default(0);
+            $table->unsignedInteger('resume_downloads_count')->default(0);
             $table->timestamps();
         });
     }
