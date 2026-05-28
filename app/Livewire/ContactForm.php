@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Services\ContactService;
 use Livewire\Component;
 
 class ContactForm extends Component
@@ -28,11 +29,16 @@ class ContactForm extends Component
         $this->validateOnly($propertyName);
     }
 
-    public function submit(): void
+    public function submit(ContactService $service): void
     {
         $this->validate();
 
-        // No email sending — just mark as submitted
+        $service->store([
+            'name' => $this->name,
+            'email' => $this->email,
+            'message' => $this->message,
+        ]);
+
         $this->submitted = true;
     }
 

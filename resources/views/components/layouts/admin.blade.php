@@ -47,6 +47,22 @@
                 Dashboard
             </a>
 
+            {{-- Contacts (standalone top-level) --}}
+            @php
+                $unreadContacts = \App\Models\Contact::where('is_read', false)->count();
+            @endphp
+            <a href="{{ route('admin.contact.index') }}"
+                class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('admin.contact.*') ? 'bg-primary/10 text-primary-light' : 'text-gray-400 hover:text-white hover:bg-dark-700' }} transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                Contacts
+                @if ($unreadContacts > 0)
+                    <span class="ml-auto bg-primary text-white text-xs font-medium rounded-full px-2 py-0.5">{{ $unreadContacts }}</span>
+                @endif
+            </a>
+
             {{-- Portfolio Manager collapsible menu --}}
             @php
                 $portfolioActive =

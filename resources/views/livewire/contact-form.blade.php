@@ -6,8 +6,8 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                 </svg>
             </div>
-            <h3 class="text-2xl font-bold text-white mb-2">Message Sent!</h3>
-            <p class="text-gray-400">Thank you for reaching out. I'll get back to you soon.</p>
+            <h3 class="text-2xl font-bold text-white mb-2">Thanks for reaching out!</h3>
+            <p class="text-gray-400">Soon I will contact back.</p>
         </div>
     @else
         <form wire:submit="submit" class="space-y-6">
