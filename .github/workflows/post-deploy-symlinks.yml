@@ -1,0 +1,24 @@
+name: Post-deploy symlinks
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  fix-symlinks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for Hostinger auto-deploy to finish pulling
+        run: sleep 90
+
+      - name: Recreate storage symlinks on Hostinger via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          script: |
+            cd ~/public_html
+            rm -rf storage/app/public && ln -s ~/persistent-uploads storage/app/public
+            rm -f public/storage && ln -s ../storage/app/public public/storage
