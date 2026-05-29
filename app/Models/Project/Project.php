@@ -18,7 +18,6 @@ class Project extends Model
         'demo_url',
         'github_url',
         'is_featured',
-        'is_for_resume',
         'sort_order',
         'is_active',
         'completed_at',
@@ -29,7 +28,6 @@ class Project extends Model
         return [
             'tech_stack' => 'array',
             'is_featured' => 'boolean',
-            'is_for_resume' => 'boolean',
             'is_active' => 'boolean',
             'completed_at' => 'date',
         ];
@@ -53,10 +51,5 @@ class Project extends Model
     public function scopeFeatured(Builder $query): Builder
     {
         return $query->where('is_featured', true);
-    }
-
-    public function scopeForResume(Builder $query): Builder
-    {
-        return $query->where('is_for_resume', true);
     }
 }

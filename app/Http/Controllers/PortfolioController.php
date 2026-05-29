@@ -29,7 +29,7 @@ class PortfolioController extends Controller
             'technologies' => Skill::groupedByCategory(),
             'workExperiences' => Experience::query()->active()->ordered()->with('responsibilities')->get(),
             'education' => Education::query()->ordered()->get(),
-            'projects' => Project::query()->active()->ordered()->with('images')->take(3)->get(),
+            'projects' => Project::query()->featured()->active()->ordered()->with('images')->take(3)->get(),
             'projectsHasMore' => Project::query()->active()->count() > 3,
             'blogPosts' => BlogPost::query()->published()->latest('published_at')->take(3)->get(),
             'blogPostsHasMore' => BlogPost::query()->published()->count() > 3,

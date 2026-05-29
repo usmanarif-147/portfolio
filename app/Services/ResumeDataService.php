@@ -13,9 +13,9 @@ use App\Models\User;
  * Single source of truth for resume data.
  *
  * The admin Resume Builder preview, its PDF download, and the public
- * /resume/download endpoint all consume gather() — so the resume PDF
- * stays in sync with whatever the owner has marked is_for_resume in the
- * portfolio admin (capped to 3 projects and 3 experiences).
+ * /resume/download endpoint all consume gather() — projects are sourced
+ * from is_featured (max 3) and experiences from is_for_resume (max 3),
+ * each capped via the admin form guards.
  */
 class ResumeDataService
 {
@@ -84,7 +84,7 @@ class ResumeDataService
     private function projects(): array
     {
         return Project::query()
-            ->forResume()
+            ->featured()
             ->active()
             ->ordered()
             ->take(3)

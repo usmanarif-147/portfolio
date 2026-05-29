@@ -5,11 +5,11 @@
         <span class="text-gray-300">Projects</span>
     </div>
 
-    @php $resumeCount = \App\Models\Project\Project::query()->forResume()->count(); @endphp
+    @php $featuredCount = \App\Models\Project\Project::query()->featured()->count(); @endphp
     <div class="flex items-center justify-between mb-8">
         <div>
             <h1 class="text-2xl font-mono font-bold text-white uppercase tracking-wider">Projects</h1>
-            <p class="text-gray-500 mt-1">Manage your portfolio projects. <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ $resumeCount >= 3 ? 'bg-primary/10 text-primary-light' : 'bg-dark-700 text-gray-400' }}">{{ $resumeCount }} of 3 in resume</span></p>
+            <p class="text-gray-500 mt-1">Manage your portfolio projects. <span class="ml-1 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ $featuredCount >= 3 ? 'bg-primary/10 text-primary-light' : 'bg-dark-700 text-gray-400' }}">{{ $featuredCount }} of 3 featured</span></p>
         </div>
         <a href="{{ route('admin.projects.create') }}" wire:navigate
            class="bg-primary hover:bg-primary-hover text-white font-medium rounded-lg px-4 py-2.5 transition-colors text-sm flex items-center gap-2">
@@ -50,7 +50,6 @@
                         <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Title</th>
                         <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Tech Stack</th>
                         <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Featured</th>
-                        <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Resume</th>
                         <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Status</th>
                         <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Sort Order</th>
                         <th class="text-right text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Actions</th>
@@ -87,24 +86,13 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4">
-                                @if ($project->is_featured)
-                                    <svg class="w-5 h-5 text-primary-light" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                    </svg>
-                                @else
-                                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                                    </svg>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4">
-                                <button type="button" wire:click="toggleForResume({{ $project->id }})"
-                                        class="w-7 h-7 rounded-full flex items-center justify-center transition-colors {{ $project->is_for_resume ? 'bg-primary text-white hover:bg-primary-hover' : 'bg-dark-700 text-gray-500 hover:text-white hover:bg-dark-600' }}"
-                                        title="{{ $project->is_for_resume ? 'In resume — click to remove' : 'Add to resume' }}">
-                                    @if ($project->is_for_resume)
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                <button type="button" wire:click="toggleFeatured({{ $project->id }})"
+                                        class="w-7 h-7 rounded-full flex items-center justify-center transition-colors {{ $project->is_featured ? 'bg-primary text-white hover:bg-primary-hover' : 'bg-dark-700 text-gray-500 hover:text-white hover:bg-dark-600' }}"
+                                        title="{{ $project->is_featured ? 'Featured — click to remove' : 'Mark as featured' }}">
+                                    @if ($project->is_featured)
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                                     @else
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                                     @endif
                                 </button>
                             </td>
@@ -136,7 +124,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="px-6 py-12 text-center text-gray-500">
+                            <td colspan="7" class="px-6 py-12 text-center text-gray-500">
                                 No projects found. <a href="{{ route('admin.projects.create') }}" wire:navigate class="text-primary-light hover:underline">Create one</a>.
                             </td>
                         </tr>

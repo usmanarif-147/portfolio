@@ -44,17 +44,17 @@ class ProjectIndex extends Component
         session()->flash('success', 'Project deleted successfully.');
     }
 
-    public function toggleForResume(int $id): void
+    public function toggleFeatured(int $id): void
     {
         $project = Project::findOrFail($id);
 
-        if (! $project->is_for_resume && Project::query()->forResume()->count() >= 3) {
-            session()->flash('error', 'Resume already has 3 projects. Turn one off first.');
+        if (! $project->is_featured && Project::query()->featured()->count() >= 3) {
+            session()->flash('error', 'Only 3 projects can be featured at a time. Turn one off first.');
 
             return;
         }
 
-        $project->update(['is_for_resume' => ! $project->is_for_resume]);
+        $project->update(['is_featured' => ! $project->is_featured]);
     }
 
     public function render()

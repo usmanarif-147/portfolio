@@ -14,7 +14,8 @@ class ResumeController extends Controller
     /**
      * Public resume download. Renders the same template the admin Resume Builder
      * uses, sourcing data from ResumeDataService so the public PDF stays in sync
-     * with whatever the owner has marked is_for_resume in the Portfolio admin.
+     * with the owner's featured projects and resume-marked experiences in the
+     * Portfolio admin.
      *
      * Also increments the admin's resume-download counter the first time each
      * browser hits this endpoint — deduped by a long-lived `pf_dl_resume` cookie
