@@ -31,7 +31,7 @@ Route::get('/update-database', function () {
 });
 
 Route::get('/testing', function () {
-    dd('this is testing updated');
+    dd('updated workflow path');
 });
 
 // routes

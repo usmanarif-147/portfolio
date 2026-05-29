@@ -19,6 +19,6 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
-            cd ~/public_html
+            cd ~/domains/us-tech-nerd.lt/public_html
             rm -rf storage/app/public && ln -s ~/persistent-uploads storage/app/public
             rm -f public/storage && ln -s ../storage/app/public public/storage
