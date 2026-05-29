@@ -97,11 +97,15 @@
                                 </button>
                             </td>
                             <td class="px-6 py-4">
-                                @if ($project->is_active)
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400">Active</span>
-                                @else
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-500/10 text-gray-400">Inactive</span>
-                                @endif
+                                <button type="button" wire:click="toggleActive({{ $project->id }})"
+                                        class="w-7 h-7 rounded-full flex items-center justify-center transition-colors {{ $project->is_active ? 'bg-emerald-500 text-white hover:bg-emerald-600' : 'bg-dark-700 text-gray-500 hover:text-white hover:bg-dark-600' }}"
+                                        title="{{ $project->is_active ? 'Active — click to deactivate' : 'Inactive — click to activate' }}">
+                                    @if ($project->is_active)
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                    @else
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                    @endif
+                                </button>
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-400">{{ $project->sort_order }}</td>
                             <td class="px-6 py-4 text-right">

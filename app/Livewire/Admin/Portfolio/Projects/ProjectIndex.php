@@ -49,12 +49,22 @@ class ProjectIndex extends Component
         $project = Project::findOrFail($id);
 
         if (! $project->is_featured && Project::query()->featured()->count() >= 3) {
-            session()->flash('error', 'Only 3 projects can be featured at a time. Turn one off first.');
+            $this->dispatch('toast', type: 'error', message: 'Only 3 projects can be featured at a time. Turn one off first.');
 
             return;
         }
 
         $project->update(['is_featured' => ! $project->is_featured]);
+
+        $this->dispatch('toast', type: 'success', message: $project->is_featured ? 'Project marked as featured.' : 'Project removed from featured.');
+    }
+
+    public function toggleActive(int $id): void
+    {
+        $project = Project::findOrFail($id);
+        $project->update(['is_active' => ! $project->is_active]);
+
+        $this->dispatch('toast', type: 'success', message: $project->is_active ? 'Project activated.' : 'Project deactivated.');
     }
 
     public function render()

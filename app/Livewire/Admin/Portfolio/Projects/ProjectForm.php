@@ -30,11 +30,7 @@ class ProjectForm extends Component
 
     public string $github_url = '';
 
-    public bool $is_featured = false;
-
     public int $sort_order = 0;
-
-    public bool $is_active = true;
 
     public ?string $completed_at = null;
 
@@ -68,9 +64,7 @@ class ProjectForm extends Component
             $this->tech_stack = $project->tech_stack ?? [];
             $this->demo_url = $project->demo_url ?? '';
             $this->github_url = $project->github_url ?? '';
-            $this->is_featured = $project->is_featured;
             $this->sort_order = $project->sort_order ?? 0;
-            $this->is_active = $project->is_active;
             $this->completed_at = $project->completed_at?->format('Y-m-d');
             $this->existingCoverImage = $project->cover_image;
 
@@ -172,18 +166,6 @@ class ProjectForm extends Component
             return;
         }
 
-        // Cap-3 guard: turning is_featured on must not exceed 3 (excluding self on edit).
-        if ($this->is_featured) {
-            $onCount = Project::query()->featured()
-                ->when($this->project, fn ($q) => $q->where('id', '!=', $this->project->id))
-                ->count();
-            if ($onCount >= 3) {
-                $this->addError('is_featured', 'Only 3 projects can be featured at a time. Turn one off first.');
-
-                return;
-            }
-        }
-
         $validated = $this->validate([
             'title' => 'required|string|max:200',
             'short_description' => 'required|string|max:190',
@@ -191,9 +173,7 @@ class ProjectForm extends Component
             'tech_stack' => 'array|max:8',
             'demo_url' => 'nullable|url|max:255',
             'github_url' => 'nullable|url|max:255',
-            'is_featured' => 'boolean',
             'sort_order' => 'integer|min:0',
-            'is_active' => 'boolean',
             'completed_at' => 'nullable|date',
             'coverImage' => 'nullable|image|max:8192|mimes:jpg,jpeg,png,webp',
             'galleryImages' => 'array|max:8',

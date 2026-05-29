@@ -591,6 +591,21 @@
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            Livewire.on('toast', ({ type, message }) => {
+                Swal.fire({
+                    icon: type ?? 'success',
+                    title: message,
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2500,
+                    timerProgressBar: true,
+                });
+            });
+        });
+    </script>
     @livewireScripts
 </body>
 
