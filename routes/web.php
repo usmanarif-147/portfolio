@@ -31,7 +31,7 @@ Route::get('/update-database', function () {
 });
 
 Route::get('/testing', function () {
-    dd('updated workflow path');
+    dd('uploaded all images again');
 });
 
 // routes
