@@ -30,6 +30,10 @@ Route::get('/update-database', function () {
     dd('updated');
 });
 
+Route::get('/testing', function () {
+    dd('this is testing');
+});
+
 // routes
 Route::prefix('admin')->group(function () {
     Route::get('/', fn() => redirect()->route('admin.dashboard'));
