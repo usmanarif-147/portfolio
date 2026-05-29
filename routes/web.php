@@ -31,7 +31,7 @@ Route::get('/update-database', function () {
 });
 
 Route::get('/testing', function () {
-    dd('this is testing');
+    dd('this is testing updated');
 });
 
 // routes
