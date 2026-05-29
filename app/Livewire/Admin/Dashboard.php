@@ -2,8 +2,9 @@
 
 namespace App\Livewire\Admin;
 
-use App\Models\Profile;
 use App\Models\Project\Project;
+use App\Models\ResumeDownloadLog;
+use App\Models\VisitorLog;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -12,12 +13,10 @@ class Dashboard extends Component
 {
     public function render()
     {
-        $profile = Profile::query()->first();
-
         return view('livewire.admin.dashboard', [
             'projectsCount' => Project::query()->count(),
-            'visitorsCount' => (int) ($profile?->visitors_count ?? 0),
-            'resumeDownloadsCount' => (int) ($profile?->resume_downloads_count ?? 0),
+            'visitorsCount' => VisitorLog::query()->count(),
+            'resumeDownloadsCount' => ResumeDownloadLog::query()->count(),
         ]);
     }
 }

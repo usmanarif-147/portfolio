@@ -14,9 +14,9 @@ use Illuminate\Http\Request;
 class PortfolioController extends Controller
 {
     /**
-     * Public landing page. Also increments the admin visitor counter the first
-     * time each browser hits the page — deduped by a long-lived `pf_visited`
-     * cookie so refreshes don't inflate the count.
+     * Public landing page. Each visit is logged via VisitorTrackingService for
+     * the admin analytics dashboard (owner sessions and bots are skipped inside
+     * the service).
      */
     public function index(Request $request)
     {
@@ -35,11 +35,7 @@ class PortfolioController extends Controller
             'blogPostsHasMore' => BlogPost::query()->published()->count() > 3,
         ]);
 
-        if ($user && ! $request->cookie('pf_visited')) {
-            // Atomic UPDATE; no-op when the profile row is missing.
-            Profile::query()->where('user_id', $user->id)->increment('visitors_count');
-            $response->withCookie(cookie('pf_visited', '1', 60 * 24 * 365));
-        }
+        app(\App\Services\VisitorTrackingService::class)->logVisit($request);
 
         return $response;
     }
