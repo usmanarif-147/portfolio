@@ -7,16 +7,16 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Stevebauman\Purify\Facades\Purify;
 
 class BlogPostService
 {
+    public function __construct(private BlockRenderer $blockRenderer) {}
+
     public function create(array $data, ?UploadedFile $coverImage = null, array $tags = []): BlogPost
     {
         return DB::transaction(function () use ($data, $coverImage, $tags) {
             $data['slug'] = $this->generateUniqueSlug($data['title']);
-            $data['content'] = Purify::clean($data['content']);
-            $data['reading_time_minutes'] = $this->calculateReadingTime($data['content']);
+            $data = $this->renderBlocks($data);
 
             if ($coverImage) {
                 $data['cover_image'] = $coverImage->store('blog/covers', 'public');
@@ -36,8 +36,7 @@ class BlogPostService
                 $data['slug'] = $this->generateUniqueSlug($data['title'], $post->id);
             }
 
-            $data['content'] = Purify::clean($data['content']);
-            $data['reading_time_minutes'] = $this->calculateReadingTime($data['content']);
+            $data = $this->renderBlocks($data);
 
             if ($coverImage) {
                 if ($post->cover_image) {
@@ -93,6 +92,19 @@ class BlogPostService
         foreach ($uniqueTags as $tag) {
             $post->tags()->create(['tag' => $tag]);
         }
+    }
+
+    /**
+     * Render blocks into cached HTML + table of contents and derive reading time.
+     */
+    private function renderBlocks(array $data): array
+    {
+        $rendered = $this->blockRenderer->render($data['blocks'] ?? []);
+        $data['content_html'] = $rendered['html'];
+        $data['toc'] = $rendered['toc'];
+        $data['reading_time_minutes'] = $this->calculateReadingTime($rendered['html']);
+
+        return $data;
     }
 
     private function generateUniqueSlug(string $title, ?int $excludeId = null): string

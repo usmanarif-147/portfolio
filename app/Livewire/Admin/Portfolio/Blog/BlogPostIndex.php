@@ -20,12 +20,20 @@ class BlogPostIndex extends Component
     #[Url]
     public string $statusFilter = 'all';
 
+    #[Url]
+    public string $visibilityFilter = 'all';
+
     public function updatingSearch(): void
     {
         $this->resetPage();
     }
 
     public function updatingStatusFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingVisibilityFilter(): void
     {
         $this->resetPage();
     }
@@ -51,6 +59,10 @@ class BlogPostIndex extends Component
             $query->where('status', 'draft');
         } elseif ($this->statusFilter === 'published') {
             $query->where('status', 'published');
+        }
+
+        if (in_array($this->visibilityFilter, ['public', 'private'], true)) {
+            $query->where('visibility', $this->visibilityFilter);
         }
 
         return view('livewire.admin.portfolio.blog.index', [

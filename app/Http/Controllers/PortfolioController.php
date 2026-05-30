@@ -31,8 +31,8 @@ class PortfolioController extends Controller
             'education' => Education::query()->ordered()->get(),
             'projects' => Project::query()->featured()->active()->ordered()->with('images')->take(3)->get(),
             'projectsHasMore' => Project::query()->active()->count() > 3,
-            'blogPosts' => BlogPost::query()->published()->latest('published_at')->take(3)->get(),
-            'blogPostsHasMore' => BlogPost::query()->published()->count() > 3,
+            'blogPosts' => BlogPost::query()->published()->public()->latest('published_at')->take(3)->get(),
+            'blogPostsHasMore' => BlogPost::query()->published()->public()->count() > 3,
         ]);
 
         app(\App\Services\VisitorTrackingService::class)->logVisit($request);
