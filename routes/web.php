@@ -31,7 +31,7 @@ Route::get('/update-database', function () {
 });
 
 Route::get('/testing', function () {
-    dd('uploaded all images again');
+    dd('created new branch');
 });
 
 // routes
