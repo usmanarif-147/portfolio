@@ -60,7 +60,9 @@
         <p class="text-gray-500 mt-1">{{ $blogPost ? 'Update your blog post.' : 'Write a new blog article.' }}</p>
     </div>
 
-    <div class="max-w-3xl space-y-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {{-- Main column --}}
+        <div class="lg:col-span-2 space-y-6">
         {{-- Section 1 — Basic Info --}}
         <div class="bg-dark-800 border border-dark-700 rounded-xl p-6 space-y-5">
             <h2 class="text-lg font-mono font-semibold text-white uppercase tracking-wider">Basic Info</h2>
@@ -226,6 +228,10 @@
             </div>
         </div>
 
+        </div>
+        {{-- Sidebar --}}
+        <div class="space-y-6">
+
         {{-- Section 3 — Cover Image --}}
         <div class="bg-dark-800 border border-dark-700 rounded-xl p-6 space-y-5">
             <h2 class="text-lg font-mono font-semibold text-white uppercase tracking-wider">Cover Image</h2>
@@ -335,8 +341,11 @@
             @error('visibility') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
         </div>
 
+        </div>
+    </div>
+
         {{-- Actions --}}
-        <div class="flex items-center gap-3">
+        <div class="mt-6 flex items-center gap-3">
             @if($blogPost && $blogPost->status === 'published')
                 <button wire:click="saveDraft"
                         class="bg-transparent border border-dark-600 text-gray-300 hover:bg-dark-700 font-medium rounded-lg px-6 py-2.5 transition-colors flex items-center gap-2">
@@ -376,5 +385,4 @@
                 Cancel
             </a>
         </div>
-    </div>
 </div>
