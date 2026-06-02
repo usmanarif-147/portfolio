@@ -1,25 +1,7 @@
 @props(['post'])
 
-@php
-    $hasCover = filled($post->cover_image);
-    $src = $hasCover
-        ? (\Illuminate\Support\Str::startsWith($post->cover_image, 'http') ? $post->cover_image : asset('storage/'.$post->cover_image))
-        : null;
-@endphp
-
 <a href="{{ route('blogs.show', $post->slug) }}"
    class="group flex h-full flex-col overflow-hidden rounded-2xl border border-white/[0.04] bg-dark-800 transition-all duration-300 hover:border-accent/20">
-    <div class="relative overflow-hidden">
-        @if($hasCover)
-            <img src="{{ $src }}" alt="{{ $post->title }}" loading="lazy"
-                 class="h-44 w-full object-cover transition-transform duration-500 group-hover:scale-105">
-        @else
-            <div class="flex h-44 w-full items-center justify-center bg-gradient-to-br from-accent/15 via-fuchsia-600/10 to-dark-800">
-                <svg class="h-10 w-10 text-accent/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-            </div>
-        @endif
-        <div class="absolute inset-0 bg-gradient-to-t from-dark-800 to-transparent"></div>
-    </div>
     <div class="flex flex-1 flex-col p-6">
         <div class="mb-3 flex items-center gap-3 text-xs text-gray-500">
             <span>{{ $post->published_at->format('M d, Y') }}</span>

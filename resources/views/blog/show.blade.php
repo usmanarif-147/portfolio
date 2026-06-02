@@ -6,23 +6,19 @@
     <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
 
     @php
-        $hasCover = filled($post->cover_image);
-        $coverSrc = $hasCover
-            ? (\Illuminate\Support\Str::startsWith($post->cover_image, 'http') ? $post->cover_image : asset('storage/'.$post->cover_image))
-            : null;
         $toc = $post->toc ?? [];
     @endphp
 
     <div x-data="articleReader()">
 
-        {{-- Scroll progress bar --}}
-        <div class="fixed inset-x-0 top-0 z-[60] h-1 bg-transparent">
+        {{-- Scroll progress bar — sits along the bottom edge of the fixed top nav --}}
+        <div class="fixed inset-x-0 top-16 z-[60] h-1 bg-transparent">
             <div class="h-full bg-gradient-to-r from-accent via-fuchsia-500 to-orange-500"
                  :style="`width: ${progress}%`"></div>
         </div>
 
         @if($isPreview)
-            <div class="fixed inset-x-0 top-1 z-50 bg-amber-500/15 border-b border-amber-500/30 px-4 py-2 text-center text-xs text-amber-300">
+            <div class="fixed inset-x-0 top-[4.25rem] z-50 bg-amber-500/15 border-b border-amber-500/30 px-4 py-2 text-center text-xs text-amber-300">
                 Preview mode — <span class="font-semibold capitalize">{{ $post->status }}</span> ·
                 <span class="font-semibold capitalize">{{ $post->visibility }}</span>. Not visible to visitors.
             </div>
@@ -41,12 +37,6 @@
                         </svg>
                         Back to Blog
                     </a>
-
-                    @if($hasCover)
-                        <div class="mb-8 overflow-hidden rounded-2xl border border-white/[0.04]">
-                            <img src="{{ $coverSrc }}" alt="{{ $post->title }}" class="h-64 w-full object-cover md:h-80">
-                        </div>
-                    @endif
 
                     @if($post->tags->isNotEmpty())
                         <div class="mb-4 flex flex-wrap gap-2">

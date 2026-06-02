@@ -44,8 +44,136 @@
         trix-toolbar .trix-button--icon::before { filter: invert(60%); }
         trix-toolbar .trix-button--icon.trix-active::before,
         trix-toolbar .trix-button--icon:hover::before { filter: invert(90%); }
+
+        /* Lists — Tailwind preflight strips markers, restore them */
+        trix-editor ul { list-style: disc; padding-left: 1.5rem; }
+        trix-editor ol { list-style: decimal; padding-left: 1.5rem; }
+        trix-editor li { margin: .2rem 0; }
+
+        /* Links */
+        trix-editor a { color: #a78bfa; text-decoration: underline; }
+
+        /* Inline code / preformatted blocks */
+        trix-editor pre {
+            background: #0d0d14;
+            color: #e5e7eb;
+            border: 1px solid #1f1f2b;
+            border-radius: .5rem;
+            padding: .75rem 1rem;
+            font-family: 'Fira Code', monospace;
+            overflow-x: auto;
+        }
+
+        /* Link dialog (dark theme readability) */
+        trix-toolbar .trix-dialog {
+            background: #12121a;
+            border: 1px solid #25253a;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .5);
+        }
+        trix-toolbar .trix-input--dialog {
+            background: #1a1a24;
+            border: 1px solid #25253a;
+            color: #e5e7eb;
+        }
+        trix-toolbar .trix-dialog .trix-button { color: #cbd5e1; }
+
+        /* Preset color / highlight swatch buttons */
+        trix-toolbar .trix-button-group--swatches {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 3px;
+        }
+        trix-toolbar .trix-swatch-label {
+            font-size: .65rem;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: #6b7280;
+            margin: 0 .15rem 0 .35rem;
+        }
+        trix-toolbar .trix-button--swatch {
+            width: 1.15rem;
+            height: 1.15rem;
+            padding: 0;
+            border-radius: .3rem;
+            border: 1px solid rgba(255, 255, 255, .12);
+            background-clip: padding-box;
+            transition: transform .12s, box-shadow .12s;
+        }
+        trix-toolbar .trix-button--swatch:hover { transform: scale(1.12); }
+        trix-toolbar .trix-button--swatch.trix-active {
+            box-shadow: 0 0 0 2px #12121a, 0 0 0 4px #a78bfa;
+        }
     </style>
     <script src="https://unpkg.com/trix@2.1.8/dist/trix.umd.min.js"></script>
+    <script>
+        (function () {
+            if (!window.Trix || window.__trixSwatchesRegistered) return;
+            window.__trixSwatchesRegistered = true;
+
+            // Text colors — parser matches the normalized rgb() the browser reports.
+            var textColors = [
+                { name: 'txtPurple', hex: '#a78bfa', rgb: 'rgb(167, 139, 250)' },
+                { name: 'txtGreen',  hex: '#34d399', rgb: 'rgb(52, 211, 153)' },
+                { name: 'txtAmber',  hex: '#fbbf24', rgb: 'rgb(251, 191, 36)' },
+                { name: 'txtRed',    hex: '#f87171', rgb: 'rgb(248, 113, 113)' },
+                { name: 'txtBlue',   hex: '#60a5fa', rgb: 'rgb(96, 165, 250)' }
+            ];
+
+            // Highlight (background) colors — semi-opaque.
+            var hlColors = [
+                { name: 'hlPurple', css: 'rgba(167, 139, 250, 0.35)', rgb: 'rgba(167, 139, 250, 0.35)' },
+                { name: 'hlGreen',  css: 'rgba(52, 211, 153, 0.3)',   rgb: 'rgba(52, 211, 153, 0.3)' },
+                { name: 'hlAmber',  css: 'rgba(251, 191, 36, 0.3)',   rgb: 'rgba(251, 191, 36, 0.3)' },
+                { name: 'hlRed',    css: 'rgba(248, 113, 113, 0.3)',  rgb: 'rgba(248, 113, 113, 0.3)' },
+                { name: 'hlBlue',   css: 'rgba(96, 165, 250, 0.3)',   rgb: 'rgba(96, 165, 250, 0.3)' }
+            ];
+
+            textColors.forEach(function (c) {
+                Trix.config.textAttributes[c.name] = {
+                    style: { color: c.hex },
+                    parser: (function (rgb) {
+                        return function (el) { return el.style.color === rgb; };
+                    })(c.rgb),
+                    inheritable: true
+                };
+            });
+
+            hlColors.forEach(function (c) {
+                Trix.config.textAttributes[c.name] = {
+                    style: { backgroundColor: c.css },
+                    parser: (function (css) {
+                        return function (el) { return el.style.backgroundColor === css; };
+                    })(c.css),
+                    inheritable: true
+                };
+            });
+
+            var originalGetDefaultHTML = Trix.config.toolbar.getDefaultHTML;
+            Trix.config.toolbar.getDefaultHTML = function () {
+                var html = originalGetDefaultHTML ? originalGetDefaultHTML.call(this) : '';
+
+                var swatches = '<span class="trix-button-group trix-button-group--swatches" data-trix-button-group="swatches">';
+                swatches += '<span class="trix-swatch-label">Text</span>';
+                textColors.forEach(function (c) {
+                    swatches += '<button type="button" class="trix-button trix-button--swatch" '
+                        + 'data-trix-attribute="' + c.name + '" '
+                        + 'title="Text color" '
+                        + 'style="background-color:' + c.hex + ';"></button>';
+                });
+                swatches += '<span class="trix-swatch-label">Highlight</span>';
+                hlColors.forEach(function (c) {
+                    swatches += '<button type="button" class="trix-button trix-button--swatch" '
+                        + 'data-trix-attribute="' + c.name + '" '
+                        + 'title="Highlight color" '
+                        + 'style="background-color:' + c.css + ';"></button>';
+                });
+                swatches += '</span>';
+
+                return html + swatches;
+            };
+        })();
+    </script>
 
     <div class="flex items-center gap-2 text-xs text-gray-500 mb-2">
         <a href="{{ route('admin.dashboard') }}" wire:navigate class="hover:text-gray-300 transition-colors">Dashboard</a>
@@ -232,40 +360,6 @@
         {{-- Sidebar --}}
         <div class="space-y-6">
 
-        {{-- Section 3 — Cover Image --}}
-        <div class="bg-dark-800 border border-dark-700 rounded-xl p-6 space-y-5">
-            <h2 class="text-lg font-mono font-semibold text-white uppercase tracking-wider">Cover Image</h2>
-
-            <div>
-                @if ($existingCoverImage)
-                    <div class="mb-3 relative inline-block">
-                        <img src="{{ Storage::url($existingCoverImage) }}" alt="Cover image" class="w-40 h-28 rounded-lg object-cover">
-                        <button type="button" wire:click="removeCoverImage"
-                                class="absolute -top-2 -right-2 bg-dark-900 border border-dark-600 rounded-full p-1 text-gray-400 hover:text-red-400 transition-colors">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                        </button>
-                    </div>
-                @endif
-
-                @if ($coverImage)
-                    <div class="mb-3 relative inline-block">
-                        <img src="{{ $coverImage->temporaryUrl() }}" alt="Cover preview" class="w-40 h-28 rounded-lg object-cover">
-                        <button type="button" wire:click="$set('coverImage', null)"
-                                class="absolute -top-2 -right-2 bg-dark-900 border border-dark-600 rounded-full p-1 text-gray-400 hover:text-red-400 transition-colors">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                        </button>
-                    </div>
-                @endif
-
-                @if (!$coverImage && !$existingCoverImage)
-                    <input type="file" wire:model="coverImage" accept="image/*"
-                           class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white text-sm file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-sm file:bg-primary/10 file:text-primary-light hover:file:bg-primary/20">
-                @endif
-
-                @error('coverImage') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
-            </div>
-        </div>
-
         {{-- Section 4 — Tags --}}
         <div class="bg-dark-800 border border-dark-700 rounded-xl p-6 space-y-5">
             <h2 class="text-lg font-mono font-semibold text-white uppercase tracking-wider">Tags</h2>
@@ -317,62 +411,19 @@
             </div>
         </div>
 
-        {{-- Section 6 — Visibility --}}
-        <div class="bg-dark-800 border border-dark-700 rounded-xl p-6 space-y-4">
-            <h2 class="text-lg font-mono font-semibold text-white uppercase tracking-wider">Visibility</h2>
-            <p class="text-sm text-gray-500">Private posts never appear on the public site — only you can read them via the admin Preview.</p>
-
-            <div class="flex flex-col sm:flex-row gap-3">
-                <label class="flex-1 flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-colors {{ $visibility === 'public' ? 'border-primary bg-primary/5' : 'border-dark-600 hover:bg-dark-700/50' }}">
-                    <input type="radio" wire:model.live="visibility" value="public" class="mt-1 accent-[#7c3aed]">
-                    <span>
-                        <span class="block text-sm font-medium text-white">Public</span>
-                        <span class="block text-xs text-gray-500 mt-0.5">Shown on your portfolio's blog when published.</span>
-                    </span>
-                </label>
-                <label class="flex-1 flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-colors {{ $visibility === 'private' ? 'border-primary bg-primary/5' : 'border-dark-600 hover:bg-dark-700/50' }}">
-                    <input type="radio" wire:model.live="visibility" value="private" class="mt-1 accent-[#7c3aed]">
-                    <span>
-                        <span class="block text-sm font-medium text-white">Private</span>
-                        <span class="block text-xs text-gray-500 mt-0.5">Only for you — never visible to visitors.</span>
-                    </span>
-                </label>
-            </div>
-            @error('visibility') <p class="mt-1 text-sm text-red-400">{{ $message }}</p> @enderror
-        </div>
-
         </div>
     </div>
 
         {{-- Actions --}}
         <div class="mt-6 flex items-center gap-3">
-            @if($blogPost && $blogPost->status === 'published')
-                <button wire:click="saveDraft"
-                        class="bg-transparent border border-dark-600 text-gray-300 hover:bg-dark-700 font-medium rounded-lg px-6 py-2.5 transition-colors flex items-center gap-2">
-                    <span wire:loading.remove wire:target="saveDraft">Unpublish &amp; Save Draft</span>
-                    <span wire:loading wire:target="saveDraft" class="flex items-center gap-2">
-                        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
-                        Saving...
-                    </span>
-                </button>
-            @else
-                <button wire:click="saveDraft"
-                        class="bg-transparent border border-dark-600 text-gray-300 hover:bg-dark-700 font-medium rounded-lg px-6 py-2.5 transition-colors flex items-center gap-2">
-                    <span wire:loading.remove wire:target="saveDraft">Save Draft</span>
-                    <span wire:loading wire:target="saveDraft" class="flex items-center gap-2">
-                        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
-                        Saving...
-                    </span>
-                </button>
-                <button wire:click="publish"
-                        class="bg-primary hover:bg-primary-hover text-white font-medium rounded-lg px-6 py-2.5 transition-colors flex items-center gap-2">
-                    <span wire:loading.remove wire:target="publish">Publish</span>
-                    <span wire:loading wire:target="publish" class="flex items-center gap-2">
-                        <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
-                        Publishing...
-                    </span>
-                </button>
-            @endif
+            <button wire:click="save"
+                    class="bg-primary hover:bg-primary-hover text-white font-medium rounded-lg px-6 py-2.5 transition-colors flex items-center gap-2">
+                <span wire:loading.remove wire:target="save">{{ $blogPost ? 'Save Changes' : 'Create Post' }}</span>
+                <span wire:loading wire:target="save" class="flex items-center gap-2">
+                    <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                    Saving...
+                </span>
+            </button>
             @if($blogPost)
                 <a href="{{ route('admin.blog.preview', $blogPost) }}" target="_blank"
                    class="inline-flex items-center gap-2 text-gray-300 hover:text-white font-medium rounded-lg px-4 py-2.5 transition-colors border border-dark-600 hover:bg-dark-700">

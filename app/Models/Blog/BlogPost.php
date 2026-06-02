@@ -17,7 +17,6 @@ class BlogPost extends Model
         'toc',
         'blocks',
         'type',
-        'cover_image',
         'status',
         'visibility',
         'published_at',

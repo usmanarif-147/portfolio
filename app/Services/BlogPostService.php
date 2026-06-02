@@ -3,24 +3,18 @@
 namespace App\Services;
 
 use App\Models\Blog\BlogPost;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class BlogPostService
 {
     public function __construct(private BlockRenderer $blockRenderer) {}
 
-    public function create(array $data, ?UploadedFile $coverImage = null, array $tags = []): BlogPost
+    public function create(array $data, array $tags = []): BlogPost
     {
-        return DB::transaction(function () use ($data, $coverImage, $tags) {
+        return DB::transaction(function () use ($data, $tags) {
             $data['slug'] = $this->generateUniqueSlug($data['title']);
             $data = $this->renderBlocks($data);
-
-            if ($coverImage) {
-                $data['cover_image'] = $coverImage->store('blog/covers', 'public');
-            }
 
             $post = BlogPost::create($data);
             $this->syncTags($post, $tags);
@@ -29,23 +23,14 @@ class BlogPostService
         });
     }
 
-    public function update(BlogPost $post, array $data, ?UploadedFile $coverImage = null, array $tags = []): BlogPost
+    public function update(BlogPost $post, array $data, array $tags = []): BlogPost
     {
-        return DB::transaction(function () use ($post, $data, $coverImage, $tags) {
+        return DB::transaction(function () use ($post, $data, $tags) {
             if ($data['title'] !== $post->title) {
                 $data['slug'] = $this->generateUniqueSlug($data['title'], $post->id);
             }
 
             $data = $this->renderBlocks($data);
-
-            if ($coverImage) {
-                if ($post->cover_image) {
-                    Storage::disk('public')->delete($post->cover_image);
-                }
-                $data['cover_image'] = $coverImage->store('blog/covers', 'public');
-            } elseif (array_key_exists('cover_image', $data) && $data['cover_image'] === null && $post->cover_image) {
-                Storage::disk('public')->delete($post->cover_image);
-            }
 
             $post->update($data);
             $this->syncTags($post, $tags);
@@ -56,10 +41,6 @@ class BlogPostService
 
     public function delete(BlogPost $post): void
     {
-        if ($post->cover_image) {
-            Storage::disk('public')->delete($post->cover_image);
-        }
-
         $post->delete();
     }
 

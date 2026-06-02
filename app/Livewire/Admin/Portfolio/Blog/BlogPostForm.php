@@ -7,13 +7,10 @@ use App\Services\BlogPostService;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
-use Livewire\WithFileUploads;
 
 #[Layout('components.layouts.admin')]
 class BlogPostForm extends Component
 {
-    use WithFileUploads;
-
     public ?BlogPost $blogPost = null;
 
     public string $title = '';
@@ -22,7 +19,7 @@ class BlogPostForm extends Component
 
     public string $status = 'draft';
 
-    public string $visibility = 'public';
+    public string $visibility = 'private';
 
     public string $type = 'blog';
 
@@ -37,13 +34,6 @@ class BlogPostForm extends Component
 
     public string $tagInput = '';
 
-    // Image handling
-    public $coverImage = null;
-
-    public ?string $existingCoverImage = null;
-
-    public bool $removeCover = false;
-
     public function mount(?BlogPost $blogPost = null): void
     {
         if ($blogPost && $blogPost->exists) {
@@ -51,12 +41,11 @@ class BlogPostForm extends Component
             $this->title = $blogPost->title;
             $this->excerpt = $blogPost->excerpt ?? '';
             $this->status = $blogPost->status;
-            $this->visibility = $blogPost->visibility ?? 'public';
+            $this->visibility = $blogPost->visibility ?? 'private';
             $this->type = $blogPost->type ?? 'blog';
             $this->blocks = $blogPost->blocks ?? [];
             $this->meta_title = $blogPost->meta_title ?? '';
             $this->meta_description = $blogPost->meta_description ?? '';
-            $this->existingCoverImage = $blogPost->cover_image;
             $this->tags = $blogPost->tags->pluck('tag')->toArray();
         } else {
             // Seed starter blocks for a new post
@@ -157,29 +146,11 @@ class BlogPostForm extends Component
     }
 
     // -------------------------------------------------------------------------
-    // Cover image
-    // -------------------------------------------------------------------------
-
-    public function removeCoverImage(): void
-    {
-        $this->coverImage = null;
-        $this->existingCoverImage = null;
-        $this->removeCover = true;
-    }
-
-    // -------------------------------------------------------------------------
     // Save actions
     // -------------------------------------------------------------------------
 
-    public function saveDraft(BlogPostService $service): void
+    public function save(BlogPostService $service): void
     {
-        $this->status = 'draft';
-        $this->savePost($service);
-    }
-
-    public function publish(BlogPostService $service): void
-    {
-        $this->status = 'published';
         $this->savePost($service);
     }
 
@@ -190,10 +161,8 @@ class BlogPostForm extends Component
             'excerpt' => 'nullable|string|max:500',
             'blocks' => 'required|array|min:1',
             'blocks.*.type' => 'required|string|in:heading,richtext,code',
-            'visibility' => 'required|in:public,private',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string|max:500',
-            'coverImage' => 'nullable|image|max:2048|mimes:jpg,jpeg,png,webp',
             'tags' => 'array',
             'tags.*' => 'string|max:50',
         ]);
@@ -220,35 +189,28 @@ class BlogPostForm extends Component
             return;
         }
 
-        $postData = collect($validated)->except(['coverImage', 'tags', 'blocks'])->toArray();
-        $postData['status'] = $this->status;
+        $postData = collect($validated)->except(['tags', 'blocks'])->toArray();
         $postData['type'] = $this->type;
         // Use the full block payload — $validated['blocks'] only contains the
         // `type` key per block (it's the only ruled sub-attribute).
         $postData['blocks'] = $this->blocks;
 
-        if ($this->status === 'published') {
-            $postData['published_at'] = now();
-        } else {
-            $postData['published_at'] = null;
-        }
-
-        if ($this->removeCover && ! $this->coverImage) {
-            $postData['cover_image'] = null;
-        }
-
         if ($this->blogPost) {
+            // Edit: preserve existing status/visibility/published_at values.
             $service->update(
                 $this->blogPost,
                 $postData,
-                $this->coverImage,
                 $this->tags,
             );
             $message = 'Blog post updated successfully.';
         } else {
+            // New post: publish immediately as a private post.
+            $postData['status'] = 'published';
+            $postData['published_at'] = now();
+            $postData['visibility'] = 'private';
+
             $service->create(
                 $postData,
-                $this->coverImage,
                 $this->tags,
             );
             $message = 'Blog post created successfully.';

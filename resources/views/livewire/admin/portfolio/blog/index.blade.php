@@ -68,12 +68,6 @@
                 <input type="text" wire:model.live.debounce.300ms="search" placeholder="Search posts..."
                        class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
             </div>
-            <select wire:model.live="statusFilter"
-                    class="bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
-                <option value="all">All Status</option>
-                <option value="draft">Draft</option>
-                <option value="published">Published</option>
-            </select>
             <select wire:model.live="visibilityFilter"
                     class="bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
                 <option value="all">All Visibility</option>
@@ -89,9 +83,7 @@
             <table class="w-full">
                 <thead>
                     <tr class="bg-dark-700/50">
-                        <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Cover</th>
                         <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Title</th>
-                        <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Status</th>
                         <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Visibility</th>
                         <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Tags</th>
                         <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Reading Time</th>
@@ -104,38 +96,22 @@
                     @forelse ($posts as $post)
                         <tr class="hover:bg-dark-700/30 transition-colors">
                             <td class="px-6 py-4">
-                                @if ($post->cover_image)
-                                    <img src="{{ Storage::url($post->cover_image) }}" alt="{{ $post->title }}" class="w-10 h-10 rounded object-cover">
-                                @else
-                                    <div class="w-10 h-10 rounded bg-dark-700 flex items-center justify-center">
-                                        <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                        </svg>
-                                    </div>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4">
                                 <div class="text-sm text-white font-medium">{{ $post->title }}</div>
                                 @if ($post->excerpt)
                                     <div class="text-xs text-gray-400 truncate max-w-[200px]">{{ Str::limit($post->excerpt, 50) }}</div>
                                 @endif
                             </td>
                             <td class="px-6 py-4">
-                                @if ($post->status === 'published')
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400">Published</span>
-                                @else
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400">Draft</span>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4">
-                                @if ($post->visibility === 'private')
-                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-dark-700 text-gray-300">
+                                <button type="button" wire:click="toggleVisibility({{ $post->id }})"
+                                        class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium transition-colors {{ $post->visibility === 'public' ? 'bg-emerald-500 text-white hover:bg-emerald-600' : 'bg-dark-700 text-gray-300 hover:bg-dark-600 hover:text-white' }}"
+                                        title="{{ $post->visibility === 'public' ? 'Public — click to make private' : 'Private — click to make public' }}">
+                                    @if ($post->visibility === 'public')
+                                        Public
+                                    @else
                                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                                         Private
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-info/10 text-info">Public</span>
-                                @endif
+                                    @endif
+                                </button>
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex flex-wrap gap-1">
@@ -180,7 +156,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="px-6 py-12 text-center text-gray-500">
+                            <td colspan="7" class="px-6 py-12 text-center text-gray-500">
                                 No blog posts found. <a href="{{ route('admin.blog.create') }}" wire:navigate class="text-primary-light hover:underline">Create one</a>.
                             </td>
                         </tr>
