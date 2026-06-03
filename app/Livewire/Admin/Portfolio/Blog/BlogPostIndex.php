@@ -18,14 +18,14 @@ class BlogPostIndex extends Component
     public string $search = '';
 
     #[Url]
-    public string $statusFilter = 'all';
+    public string $visibilityFilter = 'all';
 
     public function updatingSearch(): void
     {
         $this->resetPage();
     }
 
-    public function updatingStatusFilter(): void
+    public function updatingVisibilityFilter(): void
     {
         $this->resetPage();
     }
@@ -34,6 +34,25 @@ class BlogPostIndex extends Component
     {
         $service->delete(BlogPost::findOrFail($id));
         session()->flash('success', 'Blog post deleted successfully.');
+    }
+
+    public function toggleVisibility(int $id): void
+    {
+        $post = BlogPost::findOrFail($id);
+
+        $makePublic = $post->visibility !== 'public';
+
+        if ($makePublic) {
+            $post->update([
+                'visibility' => 'public',
+                'status' => 'published',
+                'published_at' => $post->published_at ?? now(),
+            ]);
+        } else {
+            $post->update(['visibility' => 'private']);
+        }
+
+        $this->dispatch('toast', type: 'success', message: $makePublic ? 'Post is now public.' : 'Post is now private.');
     }
 
     public function render()
@@ -47,10 +66,8 @@ class BlogPostIndex extends Component
             });
         }
 
-        if ($this->statusFilter === 'draft') {
-            $query->where('status', 'draft');
-        } elseif ($this->statusFilter === 'published') {
-            $query->where('status', 'published');
+        if (in_array($this->visibilityFilter, ['public', 'private'], true)) {
+            $query->where('visibility', $this->visibilityFilter);
         }
 
         return view('livewire.admin.portfolio.blog.index', [

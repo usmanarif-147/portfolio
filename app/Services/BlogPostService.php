@@ -3,24 +3,18 @@
 namespace App\Services;
 
 use App\Models\Blog\BlogPost;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Stevebauman\Purify\Facades\Purify;
 
 class BlogPostService
 {
-    public function create(array $data, ?UploadedFile $coverImage = null, array $tags = []): BlogPost
-    {
-        return DB::transaction(function () use ($data, $coverImage, $tags) {
-            $data['slug'] = $this->generateUniqueSlug($data['title']);
-            $data['content'] = Purify::clean($data['content']);
-            $data['reading_time_minutes'] = $this->calculateReadingTime($data['content']);
+    public function __construct(private BlockRenderer $blockRenderer) {}
 
-            if ($coverImage) {
-                $data['cover_image'] = $coverImage->store('blog/covers', 'public');
-            }
+    public function create(array $data, array $tags = []): BlogPost
+    {
+        return DB::transaction(function () use ($data, $tags) {
+            $data['slug'] = $this->generateUniqueSlug($data['title']);
+            $data = $this->renderBlocks($data);
 
             $post = BlogPost::create($data);
             $this->syncTags($post, $tags);
@@ -29,24 +23,14 @@ class BlogPostService
         });
     }
 
-    public function update(BlogPost $post, array $data, ?UploadedFile $coverImage = null, array $tags = []): BlogPost
+    public function update(BlogPost $post, array $data, array $tags = []): BlogPost
     {
-        return DB::transaction(function () use ($post, $data, $coverImage, $tags) {
+        return DB::transaction(function () use ($post, $data, $tags) {
             if ($data['title'] !== $post->title) {
                 $data['slug'] = $this->generateUniqueSlug($data['title'], $post->id);
             }
 
-            $data['content'] = Purify::clean($data['content']);
-            $data['reading_time_minutes'] = $this->calculateReadingTime($data['content']);
-
-            if ($coverImage) {
-                if ($post->cover_image) {
-                    Storage::disk('public')->delete($post->cover_image);
-                }
-                $data['cover_image'] = $coverImage->store('blog/covers', 'public');
-            } elseif (array_key_exists('cover_image', $data) && $data['cover_image'] === null && $post->cover_image) {
-                Storage::disk('public')->delete($post->cover_image);
-            }
+            $data = $this->renderBlocks($data);
 
             $post->update($data);
             $this->syncTags($post, $tags);
@@ -57,10 +41,6 @@ class BlogPostService
 
     public function delete(BlogPost $post): void
     {
-        if ($post->cover_image) {
-            Storage::disk('public')->delete($post->cover_image);
-        }
-
         $post->delete();
     }
 
@@ -93,6 +73,19 @@ class BlogPostService
         foreach ($uniqueTags as $tag) {
             $post->tags()->create(['tag' => $tag]);
         }
+    }
+
+    /**
+     * Render blocks into cached HTML + table of contents and derive reading time.
+     */
+    private function renderBlocks(array $data): array
+    {
+        $rendered = $this->blockRenderer->render($data['blocks'] ?? []);
+        $data['content_html'] = $rendered['html'];
+        $data['toc'] = $rendered['toc'];
+        $data['reading_time_minutes'] = $this->calculateReadingTime($rendered['html']);
+
+        return $data;
     }
 
     private function generateUniqueSlug(string $title, ?int $excludeId = null): string

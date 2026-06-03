@@ -13,8 +13,12 @@ class BlogPost extends Model
         'slug',
         'excerpt',
         'content',
-        'cover_image',
+        'content_html',
+        'toc',
+        'blocks',
+        'type',
         'status',
+        'visibility',
         'published_at',
         'meta_title',
         'meta_description',
@@ -25,6 +29,8 @@ class BlogPost extends Model
     protected function casts(): array
     {
         return [
+            'toc' => 'array',
+            'blocks' => 'array',
             'published_at' => 'datetime',
             'reading_time_minutes' => 'integer',
             'view_count' => 'integer',
@@ -40,6 +46,11 @@ class BlogPost extends Model
     {
         return $query->where('status', 'published')
             ->where('published_at', '<=', now());
+    }
+
+    public function scopePublic(Builder $query): Builder
+    {
+        return $query->where('visibility', 'public');
     }
 
     public function scopeDraft(Builder $query): Builder
