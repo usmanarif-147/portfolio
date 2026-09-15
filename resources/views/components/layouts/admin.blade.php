@@ -73,6 +73,41 @@
                 Analytics
             </a>
 
+            {{-- Indus Gas business management --}}
+            @php
+                $indusGasActive = request()->routeIs('admin.indus-gas.*');
+            @endphp
+            <div x-data="{ indusGasOpen: {{ $indusGasActive ? 'true' : 'false' }} }">
+                <button @click="indusGasOpen = !indusGasOpen"
+                    class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ $indusGasActive ? 'bg-primary/10 text-primary-light' : 'text-gray-400 hover:text-white hover:bg-dark-700' }} transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v3m0 12v3m8.485-10.485l-2.121 2.121M5.636 18.364l-2.121 2.121m16.97 0l-2.121-2.121M5.636 5.636L3.515 3.515M21 12h-3M6 12H3m15.5 0a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z" />
+                    </svg>
+                    Indus Gas
+                    <svg class="w-4 h-4 ml-auto transition-transform duration-200" :class="indusGasOpen ? 'rotate-90' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+
+                <div x-show="indusGasOpen" x-transition:enter="transition ease-out duration-200"
+                    x-transition:enter-start="opacity-0 -translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
+                    x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0"
+                    x-transition:leave-end="opacity-0 -translate-y-1" class="mt-1 space-y-1">
+                    @foreach ([
+                        'admin.indus-gas.dashboard' => 'Dashboard',
+                        'admin.indus-gas.customers' => 'Customers',
+                        'admin.indus-gas.bbn-plant' => 'BBN Plant',
+                        'admin.indus-gas.fas-tube' => 'FAS Tube',
+                        'admin.indus-gas.expenses' => 'Expenses',
+                    ] as $route => $label)
+                        <a href="{{ route($route) }}" wire:navigate
+                            class="flex items-center gap-3 pl-10 pr-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs($route) ? 'bg-primary/10 text-primary-light' : 'text-gray-400 hover:text-white hover:bg-dark-700' }} transition-colors">
+                            {{ $label }}
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+
             {{-- Portfolio Manager collapsible menu --}}
             @php
                 $portfolioActive =

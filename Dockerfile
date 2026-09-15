@@ -23,6 +23,11 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www
 
+# Install dependencies before copying the application source. This lets Docker
+# reuse the dependency layer when only application code changes.
+COPY composer.json composer.lock /var/www/
+RUN composer install --optimize-autoloader --no-dev --no-scripts
+
 # Copy application source
 COPY . /var/www
 
@@ -31,9 +36,6 @@ RUN mkdir -p storage/framework/{cache/data,sessions,views} \
     && mkdir -p storage/logs \
     && mkdir -p bootstrap/cache \
     && if [ -f .env.example ]; then cp .env.example .env; else touch .env; fi
-
-# Install dependencies
-RUN composer install --optimize-autoloader --no-dev --no-scripts
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
