@@ -10,7 +10,7 @@
     <div class="flex items-center justify-between mb-8">
         <div>
             <h1 class="text-2xl font-mono font-bold text-white uppercase tracking-wider">Customers</h1>
-            <p class="text-gray-500 mt-1">Manage Indus Gas customer details.</p>
+            <p class="text-gray-500 mt-1">Manage customer details, payment terms, and cylinder allocations.</p>
         </div>
         <a href="{{ route('admin.indus-gas.customers.create') }}" wire:navigate class="bg-primary hover:bg-primary-hover text-white font-medium rounded-lg px-4 py-2.5 transition-colors text-sm flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
@@ -22,8 +22,9 @@
         <div class="mb-4 bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 rounded-lg px-4 py-3 text-sm">{{ session('success') }}</div>
     @endif
 
-    <div class="bg-dark-800 border border-dark-700 rounded-xl p-4 mb-6">
-        <input type="search" wire:model.live.debounce.300ms="search" placeholder="Search by title, location, or phone..." class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
+    <div class="bg-dark-800 border border-dark-700 rounded-xl p-4 mb-6 flex flex-col sm:flex-row gap-4">
+        <input type="search" wire:model.live.debounce.300ms="search" placeholder="Search name, contact, location, or phone..." class="flex-1 bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:ring-2 focus:ring-primary focus:border-transparent text-sm">
+        <select wire:model.live="status" class="bg-dark-700 border border-dark-600 rounded-lg px-4 py-2.5 text-white text-sm"><option value="active">Active Customers</option><option value="inactive">Inactive Customers</option><option value="all">All Customers</option></select>
     </div>
 
     <div class="bg-dark-800 border border-dark-700 rounded-xl overflow-hidden">
@@ -31,19 +32,22 @@
             <table class="w-full">
                 <thead><tr class="bg-dark-700/50">
                     <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Customer</th>
-                    <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Location</th>
-                    <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Phone</th>
-                    <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Type</th>
+                    <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Contact</th>
+                    <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Terms</th>
+                    <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Allocated</th>
+                    <th class="text-left text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Invoice</th>
                     <th class="text-right text-xs font-mono font-medium text-gray-400 uppercase tracking-wider px-6 py-3">Actions</th>
                 </tr></thead>
                 <tbody class="divide-y divide-dark-700">
                     @forelse ($customers as $customer)
                         <tr class="hover:bg-dark-700/30 transition-colors">
-                            <td class="px-6 py-4 text-sm text-white font-medium">{{ $customer->title }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-400">{{ $customer->location }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-300 font-mono">{{ $customer->phone }}</td>
+                            <td class="px-6 py-4 text-sm"><a href="{{ route('admin.indus-gas.customers.show', $customer) }}" wire:navigate class="text-white font-medium hover:text-primary-light">{{ $customer->title }}</a><span class="block text-xs text-gray-500 mt-1">{{ $customer->location }}</span></td>
+                            <td class="px-6 py-4 text-sm text-gray-300">{{ $customer->contact_person ?: '—' }}<span class="block text-xs text-gray-500 font-mono mt-1">{{ $customer->phone }}</span></td>
+                            <td class="px-6 py-4 text-sm text-gray-400">{{ match($customer->payment_term) {'bill_to_bill' => 'Bill to bill', 'cash' => 'Cash', 'weekly' => 'Weekly', 'monthly' => 'Monthly', 'custom' => 'Custom: '.$customer->payment_due_days.' days'} }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-300">{{ $customer->cylinder_allocations_sum_quantity ?? 0 }} cylinders</td>
                             <td class="px-6 py-4"><span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium {{ $customer->type === 'gst' ? 'bg-primary/10 text-primary-light' : 'bg-gray-500/10 text-gray-400' }}">{{ $customer->type === 'gst' ? 'GST' : 'Non-GST' }}</span></td>
                             <td class="px-6 py-4 text-right"><div class="flex items-center justify-end gap-2">
+                                <a href="{{ route('admin.indus-gas.customers.show', $customer) }}" wire:navigate class="text-gray-400 hover:text-primary-light transition-colors p-1 text-sm" aria-label="View {{ $customer->title }}">View</a>
                                 <a href="{{ route('admin.indus-gas.customers.edit', $customer) }}" wire:navigate class="text-gray-400 hover:text-primary-light transition-colors p-1" aria-label="Edit {{ $customer->title }}">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                                 </a>
@@ -53,7 +57,7 @@
                             </div></td>
                         </tr>
                     @empty
-                        <tr><td colspan="5" class="px-6 py-12 text-center text-gray-500">No customers found. <a href="{{ route('admin.indus-gas.customers.create') }}" wire:navigate class="text-primary-light hover:underline">Add your first customer</a>.</td></tr>
+                        <tr><td colspan="6" class="px-6 py-12 text-center text-gray-500">No customers found. <a href="{{ route('admin.indus-gas.customers.create') }}" wire:navigate class="text-primary-light hover:underline">Add your first customer</a>.</td></tr>
                     @endforelse
                 </tbody>
             </table>

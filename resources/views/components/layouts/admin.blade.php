@@ -96,12 +96,15 @@
                     @foreach ([
                         'admin.indus-gas.dashboard' => 'Dashboard',
                         'admin.indus-gas.customers' => 'Customers',
-                        'admin.indus-gas.bbn-plant' => 'BBN Plant',
-                        'admin.indus-gas.fas-tube' => 'FAS Tube',
+                        'admin.indus-gas.daily-operations' => 'Daily Operations',
+                        'admin.indus-gas.payments-ledgers' => 'Payments & Ledgers',
                         'admin.indus-gas.expenses' => 'Expenses',
+                        'admin.indus-gas.reports' => 'Reports & Planning',
+                        'admin.indus-gas.documents' => 'Documents',
+                        'admin.indus-gas.settings.index' => 'Settings',
                     ] as $route => $label)
                         <a href="{{ route($route) }}" wire:navigate
-                            class="flex items-center gap-3 pl-10 pr-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs($route) ? 'bg-primary/10 text-primary-light' : 'text-gray-400 hover:text-white hover:bg-dark-700' }} transition-colors">
+                            class="flex items-center gap-3 pl-10 pr-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs($route) || ($route === 'admin.indus-gas.settings.index' && request()->routeIs('admin.indus-gas.settings.*')) ? 'bg-primary/10 text-primary-light' : 'text-gray-400 hover:text-white hover:bg-dark-700' }} transition-colors">
                             {{ $label }}
                         </a>
                     @endforeach

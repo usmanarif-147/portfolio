@@ -17,7 +17,15 @@ class CustomerIndex extends Component
     #[Url]
     public string $search = '';
 
+    #[Url]
+    public string $status = 'active';
+
     public function updatingSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatingStatus(): void
     {
         $this->resetPage();
     }
@@ -32,13 +40,16 @@ class CustomerIndex extends Component
     public function render()
     {
         $customers = Customer::query()
+            ->withSum('cylinderAllocations', 'quantity')
             ->when($this->search !== '', function ($query) {
                 $query->where(function ($query) {
                     $query->where('title', 'like', '%'.$this->search.'%')
                         ->orWhere('location', 'like', '%'.$this->search.'%')
-                        ->orWhere('phone', 'like', '%'.$this->search.'%');
+                        ->orWhere('phone', 'like', '%'.$this->search.'%')
+                        ->orWhere('contact_person', 'like', '%'.$this->search.'%');
                 });
             })
+            ->when($this->status !== 'all', fn ($query) => $query->where('is_active', $this->status === 'active'))
             ->latest()
             ->paginate(15);
 
