@@ -31,4 +31,9 @@ class Delivery extends Model
     {
         return $this->hasMany(DeliveryItem::class);
     }
+
+    public function invoice(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Invoice::class);
+    }
 }

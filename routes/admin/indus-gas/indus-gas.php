@@ -4,6 +4,13 @@ use App\Livewire\Admin\IndusGas\ComingSoon;
 use App\Livewire\Admin\IndusGas\Customers\CustomerForm;
 use App\Livewire\Admin\IndusGas\Customers\CustomerIndex;
 use App\Livewire\Admin\IndusGas\Customers\CustomerShow;
+use App\Livewire\Admin\IndusGas\Billing\BillingIndex;
+use App\Livewire\Admin\IndusGas\Billing\LedgerShow;
+use App\Livewire\Admin\IndusGas\Billing\PaymentForm;
+use App\Livewire\Admin\IndusGas\Expenses\ExpenseForm;
+use App\Livewire\Admin\IndusGas\Expenses\ExpenseIndex;
+use App\Livewire\Admin\IndusGas\Reports\ReportIndex;
+use App\Http\Controllers\IndusGasPdfController;
 use App\Livewire\Admin\IndusGas\Operations\DeliveryForm;
 use App\Livewire\Admin\IndusGas\Operations\OperationsIndex;
 use App\Livewire\Admin\IndusGas\Operations\RefillForm;
@@ -34,17 +41,16 @@ Route::get('/indus-gas/daily-operations/refills/create', RefillForm::class)->nam
 Route::get('/indus-gas/daily-operations/deliveries/create', DeliveryForm::class)->name('admin.indus-gas.deliveries.create');
 Route::get('/indus-gas/daily-operations/stock', StockIndex::class)->name('admin.indus-gas.stock');
 
-Route::get('/indus-gas/payments-ledgers', ComingSoon::class)
-    ->defaults('feature', 'Payments & Ledgers')
-    ->name('admin.indus-gas.payments-ledgers');
+Route::get('/indus-gas/payments-ledgers', BillingIndex::class)->name('admin.indus-gas.payments-ledgers');
+Route::get('/indus-gas/payments-ledgers/payments/create', PaymentForm::class)->name('admin.indus-gas.payments.create');
+Route::get('/indus-gas/payments-ledgers/customers/{customer}', LedgerShow::class)->name('admin.indus-gas.ledgers.show');
+Route::get('/indus-gas/invoices/{invoice}/pdf', [IndusGasPdfController::class, 'invoice'])->name('admin.indus-gas.invoices.pdf');
+Route::get('/indus-gas/customers/{customer}/ledger-pdf', [IndusGasPdfController::class, 'ledger'])->name('admin.indus-gas.ledgers.pdf');
 
-Route::get('/indus-gas/expenses', ComingSoon::class)
-    ->defaults('feature', 'Expenses')
-    ->name('admin.indus-gas.expenses');
+Route::get('/indus-gas/expenses', ExpenseIndex::class)->name('admin.indus-gas.expenses');
+Route::get('/indus-gas/expenses/create', ExpenseForm::class)->name('admin.indus-gas.expenses.create');
 
-Route::get('/indus-gas/reports', ComingSoon::class)
-    ->defaults('feature', 'Reports & Planning')
-    ->name('admin.indus-gas.reports');
+Route::get('/indus-gas/reports', ReportIndex::class)->name('admin.indus-gas.reports');
 
 Route::get('/indus-gas/documents', ComingSoon::class)
     ->defaults('feature', 'Documents')
