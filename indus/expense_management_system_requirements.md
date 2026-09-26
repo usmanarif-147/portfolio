@@ -22,7 +22,7 @@
 
 - **Fragmented WhatsApp Tracking:** Expense reports sent via WhatsApp groups lack status indicators (e.g., "Paid", "Pending", "Partially Settled"), making audit and history lookup difficult.
 
-- **Lack of Visibility:** No real-time dashboard exists to show overall spend trends, daily dynamic totals, spend breakdown per individual, or remaining monthly operational budgets.
+- **Lack of Visibility:** No dashboard exists to show overall spend trends, daily dynamic totals, spend breakdown per individual, or remaining monthly operational budgets.
 
 ## 2. As-Is Workflow (Current Operational Process)
 

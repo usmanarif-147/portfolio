@@ -10,9 +10,10 @@ services:
       - sh
       - -c
       - |
+        umask 0002
         mkdir -p storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs bootstrap/cache
         chown -R www-data:www-data storage bootstrap/cache
-        chmod -R ug+rwX storage bootstrap/cache
+        chmod -R a+rwX storage bootstrap/cache
         exec php-fpm
     volumes:
       - .:/var/www
