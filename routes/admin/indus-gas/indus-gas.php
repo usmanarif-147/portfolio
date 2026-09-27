@@ -8,6 +8,7 @@ use App\Livewire\Admin\IndusGas\Billing\BillingIndex;
 use App\Livewire\Admin\IndusGas\Billing\LedgerShow;
 use App\Livewire\Admin\IndusGas\Billing\PaymentForm;
 use App\Http\Controllers\Admin\IndusGas\ExpensesController;
+use App\Http\Controllers\Admin\IndusGas\ExpensesV1Controller;
 use App\Livewire\Admin\IndusGas\Reports\ReportIndex;
 use App\Http\Controllers\IndusGasPdfController;
 use App\Livewire\Admin\IndusGas\Operations\DeliveryForm;
@@ -47,6 +48,8 @@ Route::get('/indus-gas/invoices/{invoice}/pdf', [IndusGasPdfController::class, '
 Route::get('/indus-gas/customers/{customer}/ledger-pdf', [IndusGasPdfController::class, 'ledger'])->name('admin.indus-gas.ledgers.pdf');
 
 Route::get('/indus-gas/expenses', ExpensesController::class)->name('admin.indus-gas.expenses');
+
+Route::get('/indus-gas/expenses-v1', ExpensesV1Controller::class)->name('admin.indus-gas.expenses-v1');
 
 Route::get('/indus-gas/reports', ReportIndex::class)->name('admin.indus-gas.reports');
 

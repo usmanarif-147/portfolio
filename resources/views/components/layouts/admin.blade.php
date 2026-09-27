@@ -99,6 +99,7 @@
                         'admin.indus-gas.daily-operations' => 'Daily Operations',
                         'admin.indus-gas.payments-ledgers' => 'Payments & Ledgers',
                         'admin.indus-gas.expenses' => 'Expenses',
+                        'admin.indus-gas.expenses-v1' => 'Expenses v1',
                         'admin.indus-gas.reports' => 'Reports & Planning',
                         'admin.indus-gas.documents' => 'Documents',
                         'admin.indus-gas.settings.index' => 'Settings',

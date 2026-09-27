@@ -18,7 +18,7 @@
                 <p class="px-3 pb-3 pt-2 text-xs font-semibold uppercase tracking-wider text-gray-500">Expense areas</p>
 
                 <div class="flex gap-2 overflow-x-auto pb-1 lg:block lg:space-y-1 lg:overflow-visible" role="tablist" aria-label="Expense areas">
-                    @foreach (['LPG', 'Vehicle', 'Warehouse', 'Bike', 'Car', 'Travel', 'Bilal', 'Usman', 'Younus', 'Ikram', 'Driver'] as $tab)
+                    @foreach (['LPG', 'Vehicle', 'Warehouse', 'Bike', 'Car', 'Travel'] as $tab)
                         <button type="button" role="tab" @click="activeTab = '{{ $tab }}'"
                             :aria-selected="activeTab === '{{ $tab }}'"
                             :class="activeTab === '{{ $tab }}' ? 'bg-primary/15 text-primary-light ring-1 ring-inset ring-primary/30' : 'text-gray-400 hover:bg-dark-700 hover:text-white'"
@@ -36,10 +36,19 @@
             </aside>
 
             <div class="lg:col-span-3">
-                @foreach (['LPG', 'Vehicle', 'Warehouse', 'Bike', 'Car', 'Travel', 'Bilal', 'Usman', 'Younus', 'Ikram', 'Driver'] as $tab)
+                @foreach (['LPG', 'Vehicle', 'Warehouse', 'Bike', 'Car', 'Travel'] as $tab)
                     <section x-show="activeTab === '{{ $tab }}'" x-cloak x-transition.opacity.duration.150ms
                         class="min-h-80 rounded-xl border border-dark-700 bg-dark-800 p-6 sm:p-8" role="tabpanel"
-                        aria-label="{{ $tab }} expenses" @if (in_array($tab, ['LPG', 'Vehicle', 'Warehouse', 'Travel'])) x-data="{ expenseType: '{{ $tab === 'LPG' ? 'filling_charges' : ($tab === 'Vehicle' ? 'fuel' : ($tab === 'Warehouse' ? 'stationery' : 'ring_road_toll_tax')) }}', payers: [], amounts: {} }" @endif>
+                        aria-label="{{ $tab }} expenses"
+                        @if ($tab === 'LPG')
+                            x-data="expenseForm({ expenseType: 'filling_charges', expenseTypes: @js([['id' => 'filling_charges', 'name' => 'Filling Charges'], ['id' => 'filling_cost', 'name' => 'Filling Cost']]), people: @js([['id' => 'usman', 'name' => 'Usman'], ['id' => 'bilal', 'name' => 'Bilal'], ['id' => 'younus', 'name' => 'Younus'], ['id' => 'ikram', 'name' => 'Ikram']]) })"
+                        @elseif ($tab === 'Vehicle')
+                            x-data="expenseForm({ expenseType: 'fuel', expenseTypes: @js([['id' => 'fuel', 'name' => 'Fuel'], ['id' => 'oil_change', 'name' => 'Oil Change'], ['id' => 'air_pressure', 'name' => 'Air Pressure']]), people: @js([['id' => 'usman', 'name' => 'Usman'], ['id' => 'bilal', 'name' => 'Bilal'], ['id' => 'younus', 'name' => 'Younus'], ['id' => 'ikram', 'name' => 'Ikram']]) })"
+                        @elseif ($tab === 'Warehouse')
+                            x-data="expenseForm({ expenseType: 'stationery', expenseTypes: @js([['id' => 'stationery', 'name' => 'Stationery'], ['id' => 'rent', 'name' => 'Rent'], ['id' => 'cleaning', 'name' => 'Cleaning'], ['id' => 'equipment', 'name' => 'Equipment']]), people: @js([['id' => 'usman', 'name' => 'Usman'], ['id' => 'bilal', 'name' => 'Bilal'], ['id' => 'younus', 'name' => 'Younus'], ['id' => 'ikram', 'name' => 'Ikram']]) })"
+                        @elseif ($tab === 'Travel')
+                            x-data="expenseForm({ expenseType: 'ring_road_toll_tax', expenseTypes: @js([['id' => 'ring_road_toll_tax', 'name' => 'Ring Road Toll Tax'], ['id' => 'society_entry_fee', 'name' => 'Society Entry Fee']]), people: @js([['id' => 'usman', 'name' => 'Usman'], ['id' => 'bilal', 'name' => 'Bilal'], ['id' => 'younus', 'name' => 'Younus'], ['id' => 'ikram', 'name' => 'Ikram']]) })"
+                        @endif>
                         <div class="border-b border-dark-700 pb-5">
                             <p class="text-xs font-semibold uppercase tracking-wider text-primary-light">Expense area</p>
                             <h2 class="mt-2 text-xl font-mono font-semibold text-white">{{ $tab }} Expenses</h2>
@@ -47,26 +56,7 @@
 
                         @if ($tab === 'LPG')
                             <form class="mt-6 space-y-7" @submit.prevent>
-                                <div>
-                                    <div class="flex items-baseline justify-between gap-4">
-                                        <label class="text-sm font-medium text-gray-200">LPG expense type</label>
-                                        <span class="text-xs text-gray-500">Choose one</span>
-                                    </div>
-                                    <div class="mt-3 flex flex-wrap gap-3">
-                                        <button type="button" @click="expenseType = 'filling_charges'"
-                                            :class="expenseType === 'filling_charges' ? 'border-primary bg-primary/15 text-primary-light' : 'border-dark-600 bg-dark-900 text-gray-400 hover:border-primary/50 hover:text-gray-200'"
-                                            class="rounded-lg border px-4 py-3 text-left text-sm font-medium transition-colors">
-                                            <span class="block">Filling Charges</span>
-                                            <span class="mt-0.5 block text-xs font-normal opacity-75">Service charges</span>
-                                        </button>
-                                        <button type="button" @click="expenseType = 'filling_cost'"
-                                            :class="expenseType === 'filling_cost' ? 'border-primary bg-primary/15 text-primary-light' : 'border-dark-600 bg-dark-900 text-gray-400 hover:border-primary/50 hover:text-gray-200'"
-                                            class="rounded-lg border px-4 py-3 text-left text-sm font-medium transition-colors">
-                                            <span class="block">Filling Cost</span>
-                                            <span class="mt-0.5 block text-xs font-normal opacity-75">Actual LPG cost</span>
-                                        </button>
-                                    </div>
-                                </div>
+                                <x-admin.indus-gas.expenses.tag-picker group="expenseTypes" selection="expenseType" items="expenseTypes" label="LPG expense type" help="Choose one" variant="card" />
 
                                 <div class="max-w-sm">
                                     <label for="lpg-cylinder-count" class="text-sm font-medium text-gray-200">Total number of cylinders</label>
@@ -75,34 +65,21 @@
                                 </div>
 
                                 <div class="border-t border-dark-700 pt-6">
-                                    <div class="flex items-baseline justify-between gap-4">
-                                        <label class="text-sm font-medium text-gray-200">Who paid?</label>
-                                        <span class="text-xs text-gray-500">Select one or more people</span>
-                                    </div>
-                                    <div class="mt-3 flex flex-wrap gap-2">
-                                        @foreach (['Usman', 'Bilal', 'Younus', 'Ikram'] as $person)
-                                            <button type="button"
-                                                @click="payers.includes('{{ $person }}') ? payers = payers.filter(person => person !== '{{ $person }}') : payers.push('{{ $person }}')"
-                                                :class="payers.includes('{{ $person }}') ? 'border-primary bg-primary/15 text-primary-light' : 'border-dark-600 bg-dark-900 text-gray-400 hover:border-primary/50 hover:text-gray-200'"
-                                                class="rounded-full border px-4 py-2 text-sm font-medium transition-colors">
-                                                {{ $person }}
-                                            </button>
-                                        @endforeach
-                                    </div>
+                                    <x-admin.indus-gas.expenses.tag-picker group="people" selection="payers" :multiple="true" items="people" label="Who paid?" help="Select one or more people" />
 
                                     <div x-show="payers.length === 0" class="mt-3 text-sm text-gray-500">Select a person to enter the amount they paid.</div>
 
                                     <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                        @foreach (['Usman', 'Bilal', 'Younus', 'Ikram'] as $person)
-                                            <div x-show="payers.includes('{{ $person }}')" x-cloak x-transition.opacity.duration.150ms>
-                                                <label for="lpg-paid-{{ strtolower($person) }}" class="text-sm font-medium text-gray-200">{{ $person }} paid</label>
+                                        <template x-for="person in people.filter(person => payers.includes(person.id))" :key="person.id">
+                                            <div x-cloak x-transition.opacity.duration.150ms>
+                                                <label class="text-sm font-medium text-gray-200"><span x-text="person.name"></span> paid</label>
                                                 <div class="relative mt-2">
                                                     <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm text-gray-500">PKR</span>
-                                                    <input id="lpg-paid-{{ strtolower($person) }}" type="number" min="0" inputmode="decimal" x-model="amounts['{{ $person }}']" placeholder="0"
+                                                    <input type="number" min="0" inputmode="decimal" x-model="amounts[person.id]" placeholder="0"
                                                         class="block w-full rounded-lg border border-dark-600 bg-dark-900 py-2.5 pl-12 pr-3 text-sm text-white outline-none placeholder:text-gray-600 focus:border-primary focus:ring-2 focus:ring-primary/20">
                                                 </div>
                                             </div>
-                                        @endforeach
+                                        </template>
                                     </div>
                                 </div>
 
@@ -146,54 +123,28 @@
                                 <div class="flex items-center justify-end border-t border-dark-700 pt-6">
                                     <button type="button" disabled class="cursor-not-allowed rounded-lg bg-dark-700 px-5 py-2.5 text-sm font-medium text-gray-500">Save LPG expense (coming soon)</button>
                                 </div>
+                                <x-admin.indus-gas.expenses.tag-manager-modal />
                             </form>
                         @elseif ($tab === 'Vehicle')
                             <form class="mt-6 space-y-7" @submit.prevent>
-                                <div>
-                                    <div class="flex items-baseline justify-between gap-4">
-                                        <label class="text-sm font-medium text-gray-200">Vehicle expense type</label>
-                                        <span class="text-xs text-gray-500">Choose one</span>
-                                    </div>
-                                    <div class="mt-3 flex flex-wrap gap-3">
-                                        @foreach ([['fuel', 'Fuel'], ['oil_change', 'Oil Change'], ['air_pressure', 'Air Pressure']] as [$value, $label])
-                                            <button type="button" @click="expenseType = '{{ $value }}'"
-                                                :class="expenseType === '{{ $value }}' ? 'border-primary bg-primary/15 text-primary-light' : 'border-dark-600 bg-dark-900 text-gray-400 hover:border-primary/50 hover:text-gray-200'"
-                                                class="rounded-lg border px-4 py-3 text-left text-sm font-medium transition-colors">
-                                                {{ $label }}
-                                            </button>
-                                        @endforeach
-                                    </div>
-                                </div>
+                                <x-admin.indus-gas.expenses.tag-picker group="expenseTypes" selection="expenseType" items="expenseTypes" label="Vehicle expense type" help="Choose one" variant="card" />
 
                                 <div class="border-t border-dark-700 pt-6">
-                                    <div class="flex items-baseline justify-between gap-4">
-                                        <label class="text-sm font-medium text-gray-200">Who paid?</label>
-                                        <span class="text-xs text-gray-500">Select one or more people</span>
-                                    </div>
-                                    <div class="mt-3 flex flex-wrap gap-2">
-                                        @foreach (['Usman', 'Bilal', 'Younus', 'Ikram'] as $person)
-                                            <button type="button"
-                                                @click="payers.includes('{{ $person }}') ? payers = payers.filter(person => person !== '{{ $person }}') : payers.push('{{ $person }}')"
-                                                :class="payers.includes('{{ $person }}') ? 'border-primary bg-primary/15 text-primary-light' : 'border-dark-600 bg-dark-900 text-gray-400 hover:border-primary/50 hover:text-gray-200'"
-                                                class="rounded-full border px-4 py-2 text-sm font-medium transition-colors">
-                                                {{ $person }}
-                                            </button>
-                                        @endforeach
-                                    </div>
+                                    <x-admin.indus-gas.expenses.tag-picker group="people" selection="payers" :multiple="true" items="people" label="Who paid?" help="Select one or more people" />
 
                                     <div x-show="payers.length === 0" class="mt-3 text-sm text-gray-500">Select a person to enter the amount they paid.</div>
 
                                     <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                        @foreach (['Usman', 'Bilal', 'Younus', 'Ikram'] as $person)
-                                            <div x-show="payers.includes('{{ $person }}')" x-cloak x-transition.opacity.duration.150ms>
-                                                <label for="vehicle-paid-{{ strtolower($person) }}" class="text-sm font-medium text-gray-200">{{ $person }} paid</label>
+                                        <template x-for="person in people.filter(person => payers.includes(person.id))" :key="person.id">
+                                            <div x-cloak x-transition.opacity.duration.150ms>
+                                                <label class="text-sm font-medium text-gray-200"><span x-text="person.name"></span> paid</label>
                                                 <div class="relative mt-2">
                                                     <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm text-gray-500">PKR</span>
-                                                    <input id="vehicle-paid-{{ strtolower($person) }}" type="number" min="0" inputmode="decimal" x-model="amounts['{{ $person }}']" placeholder="0"
+                                                    <input type="number" min="0" inputmode="decimal" x-model="amounts[person.id]" placeholder="0"
                                                         class="block w-full rounded-lg border border-dark-600 bg-dark-900 py-2.5 pl-12 pr-3 text-sm text-white outline-none placeholder:text-gray-600 focus:border-primary focus:ring-2 focus:ring-primary/20">
                                                 </div>
                                             </div>
-                                        @endforeach
+                                        </template>
                                     </div>
                                 </div>
 
@@ -237,54 +188,28 @@
                                 <div class="flex items-center justify-end border-t border-dark-700 pt-6">
                                     <button type="button" disabled class="cursor-not-allowed rounded-lg bg-dark-700 px-5 py-2.5 text-sm font-medium text-gray-500">Save vehicle expense (coming soon)</button>
                                 </div>
+                                <x-admin.indus-gas.expenses.tag-manager-modal />
                             </form>
                         @elseif ($tab === 'Warehouse')
                             <form class="mt-6 space-y-7" @submit.prevent>
-                                <div>
-                                    <div class="flex items-baseline justify-between gap-4">
-                                        <label class="text-sm font-medium text-gray-200">Warehouse expense type</label>
-                                        <span class="text-xs text-gray-500">Choose one</span>
-                                    </div>
-                                    <div class="mt-3 flex flex-wrap gap-3">
-                                        @foreach ([['stationery', 'Stationery'], ['rent', 'Rent'], ['cleaning', 'Cleaning'], ['equipment', 'Equipment']] as [$value, $label])
-                                            <button type="button" @click="expenseType = '{{ $value }}'"
-                                                :class="expenseType === '{{ $value }}' ? 'border-primary bg-primary/15 text-primary-light' : 'border-dark-600 bg-dark-900 text-gray-400 hover:border-primary/50 hover:text-gray-200'"
-                                                class="rounded-lg border px-4 py-3 text-left text-sm font-medium transition-colors">
-                                                {{ $label }}
-                                            </button>
-                                        @endforeach
-                                    </div>
-                                </div>
+                                <x-admin.indus-gas.expenses.tag-picker group="expenseTypes" selection="expenseType" items="expenseTypes" label="Warehouse expense type" help="Choose one" variant="card" />
 
                                 <div class="border-t border-dark-700 pt-6">
-                                    <div class="flex items-baseline justify-between gap-4">
-                                        <label class="text-sm font-medium text-gray-200">Who paid?</label>
-                                        <span class="text-xs text-gray-500">Select one or more people</span>
-                                    </div>
-                                    <div class="mt-3 flex flex-wrap gap-2">
-                                        @foreach (['Usman', 'Bilal', 'Younus', 'Ikram'] as $person)
-                                            <button type="button"
-                                                @click="payers.includes('{{ $person }}') ? payers = payers.filter(person => person !== '{{ $person }}') : payers.push('{{ $person }}')"
-                                                :class="payers.includes('{{ $person }}') ? 'border-primary bg-primary/15 text-primary-light' : 'border-dark-600 bg-dark-900 text-gray-400 hover:border-primary/50 hover:text-gray-200'"
-                                                class="rounded-full border px-4 py-2 text-sm font-medium transition-colors">
-                                                {{ $person }}
-                                            </button>
-                                        @endforeach
-                                    </div>
+                                    <x-admin.indus-gas.expenses.tag-picker group="people" selection="payers" :multiple="true" items="people" label="Who paid?" help="Select one or more people" />
 
                                     <div x-show="payers.length === 0" class="mt-3 text-sm text-gray-500">Select a person to enter the amount they paid.</div>
 
                                     <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                        @foreach (['Usman', 'Bilal', 'Younus', 'Ikram'] as $person)
-                                            <div x-show="payers.includes('{{ $person }}')" x-cloak x-transition.opacity.duration.150ms>
-                                                <label for="warehouse-paid-{{ strtolower($person) }}" class="text-sm font-medium text-gray-200">{{ $person }} paid</label>
+                                        <template x-for="person in people.filter(person => payers.includes(person.id))" :key="person.id">
+                                            <div x-cloak x-transition.opacity.duration.150ms>
+                                                <label class="text-sm font-medium text-gray-200"><span x-text="person.name"></span> paid</label>
                                                 <div class="relative mt-2">
                                                     <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm text-gray-500">PKR</span>
-                                                    <input id="warehouse-paid-{{ strtolower($person) }}" type="number" min="0" inputmode="decimal" x-model="amounts['{{ $person }}']" placeholder="0"
+                                                    <input type="number" min="0" inputmode="decimal" x-model="amounts[person.id]" placeholder="0"
                                                         class="block w-full rounded-lg border border-dark-600 bg-dark-900 py-2.5 pl-12 pr-3 text-sm text-white outline-none placeholder:text-gray-600 focus:border-primary focus:ring-2 focus:ring-primary/20">
                                                 </div>
                                             </div>
-                                        @endforeach
+                                        </template>
                                     </div>
                                 </div>
 
@@ -328,54 +253,28 @@
                                 <div class="flex items-center justify-end border-t border-dark-700 pt-6">
                                     <button type="button" disabled class="cursor-not-allowed rounded-lg bg-dark-700 px-5 py-2.5 text-sm font-medium text-gray-500">Save warehouse expense (coming soon)</button>
                                 </div>
+                                <x-admin.indus-gas.expenses.tag-manager-modal />
                             </form>
                         @elseif ($tab === 'Travel')
                             <form class="mt-6 space-y-7" @submit.prevent>
-                                <div>
-                                    <div class="flex items-baseline justify-between gap-4">
-                                        <label class="text-sm font-medium text-gray-200">Travel expense type</label>
-                                        <span class="text-xs text-gray-500">Choose one</span>
-                                    </div>
-                                    <div class="mt-3 flex flex-wrap gap-3">
-                                        @foreach ([['ring_road_toll_tax', 'Ring Road Toll Tax'], ['society_entry_fee', 'Society Entry Fee']] as [$value, $label])
-                                            <button type="button" @click="expenseType = '{{ $value }}'"
-                                                :class="expenseType === '{{ $value }}' ? 'border-primary bg-primary/15 text-primary-light' : 'border-dark-600 bg-dark-900 text-gray-400 hover:border-primary/50 hover:text-gray-200'"
-                                                class="rounded-lg border px-4 py-3 text-left text-sm font-medium transition-colors">
-                                                {{ $label }}
-                                            </button>
-                                        @endforeach
-                                    </div>
-                                </div>
+                                <x-admin.indus-gas.expenses.tag-picker group="expenseTypes" selection="expenseType" items="expenseTypes" label="Travel expense type" help="Choose one" variant="card" />
 
                                 <div class="border-t border-dark-700 pt-6">
-                                    <div class="flex items-baseline justify-between gap-4">
-                                        <label class="text-sm font-medium text-gray-200">Who paid?</label>
-                                        <span class="text-xs text-gray-500">Select one or more people</span>
-                                    </div>
-                                    <div class="mt-3 flex flex-wrap gap-2">
-                                        @foreach (['Usman', 'Bilal', 'Younus', 'Ikram'] as $person)
-                                            <button type="button"
-                                                @click="payers.includes('{{ $person }}') ? payers = payers.filter(person => person !== '{{ $person }}') : payers.push('{{ $person }}')"
-                                                :class="payers.includes('{{ $person }}') ? 'border-primary bg-primary/15 text-primary-light' : 'border-dark-600 bg-dark-900 text-gray-400 hover:border-primary/50 hover:text-gray-200'"
-                                                class="rounded-full border px-4 py-2 text-sm font-medium transition-colors">
-                                                {{ $person }}
-                                            </button>
-                                        @endforeach
-                                    </div>
+                                    <x-admin.indus-gas.expenses.tag-picker group="people" selection="payers" :multiple="true" items="people" label="Who paid?" help="Select one or more people" />
 
                                     <div x-show="payers.length === 0" class="mt-3 text-sm text-gray-500">Select a person to enter the amount they paid.</div>
 
                                     <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                        @foreach (['Usman', 'Bilal', 'Younus', 'Ikram'] as $person)
-                                            <div x-show="payers.includes('{{ $person }}')" x-cloak x-transition.opacity.duration.150ms>
-                                                <label for="travel-paid-{{ strtolower($person) }}" class="text-sm font-medium text-gray-200">{{ $person }} paid</label>
+                                        <template x-for="person in people.filter(person => payers.includes(person.id))" :key="person.id">
+                                            <div x-cloak x-transition.opacity.duration.150ms>
+                                                <label class="text-sm font-medium text-gray-200"><span x-text="person.name"></span> paid</label>
                                                 <div class="relative mt-2">
                                                     <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-sm text-gray-500">PKR</span>
-                                                    <input id="travel-paid-{{ strtolower($person) }}" type="number" min="0" inputmode="decimal" x-model="amounts['{{ $person }}']" placeholder="0"
+                                                    <input type="number" min="0" inputmode="decimal" x-model="amounts[person.id]" placeholder="0"
                                                         class="block w-full rounded-lg border border-dark-600 bg-dark-900 py-2.5 pl-12 pr-3 text-sm text-white outline-none placeholder:text-gray-600 focus:border-primary focus:ring-2 focus:ring-primary/20">
                                                 </div>
                                             </div>
-                                        @endforeach
+                                        </template>
                                     </div>
                                 </div>
 
@@ -419,22 +318,22 @@
                                 <div class="flex items-center justify-end border-t border-dark-700 pt-6">
                                     <button type="button" disabled class="cursor-not-allowed rounded-lg bg-dark-700 px-5 py-2.5 text-sm font-medium text-gray-500">Save travel expense (coming soon)</button>
                                 </div>
+                                <x-admin.indus-gas.expenses.tag-manager-modal />
                             </form>
                         @elseif (in_array($tab, ['Bike', 'Car']))
-                            @php($drivers = $tab === 'Bike' ? ['Usman', 'Younus', 'Ikram'] : ['Usman', 'Bilal', 'Younus', 'Ikram'])
                             <form class="mt-6 space-y-7" @submit.prevent
-                                x-data="{
+                                x-data="expenseForm({
+                                    people: @js($tab === 'Bike' ? [['id' => 'usman', 'name' => 'Usman'], ['id' => 'younus', 'name' => 'Younus'], ['id' => 'ikram', 'name' => 'Ikram']] : [['id' => 'usman', 'name' => 'Usman'], ['id' => 'bilal', 'name' => 'Bilal'], ['id' => 'younus', 'name' => 'Younus'], ['id' => 'ikram', 'name' => 'Ikram']]),
                                     distance: '',
                                     average: '',
                                     rate: '',
-                                    driver: '',
-                                    get fuelCost() {
+                                    calculateFuelCost() {
                                         const distance = Number(this.distance);
                                         const average = Number(this.average);
                                         const rate = Number(this.rate);
                                         return distance > 0 && average > 0 && rate >= 0 ? (distance / average) * rate : null;
                                     }
-                                }">
+                                })">
                                 <div>
                                     <p class="text-sm font-medium text-gray-200">Fuel calculation</p>
                                     <p class="mt-1 text-xs text-gray-500">Enter the trip details to calculate the fuel cost automatically.</p>
@@ -460,25 +359,13 @@
                                 <div class="rounded-xl border border-primary/25 bg-primary/10 px-5 py-4">
                                     <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                                         <span class="text-sm font-medium text-primary-light">Fuel cost</span>
-                                        <span class="text-xl font-mono font-semibold text-white" x-text="fuelCost === null ? 'Enter trip details' : 'PKR ' + fuelCost.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })"></span>
+                                        <span class="text-xl font-mono font-semibold text-white" x-text="calculateFuelCost() === null ? 'Enter trip details' : 'PKR ' + calculateFuelCost().toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })"></span>
                                     </div>
                                     <p class="mt-1 text-xs text-gray-400">(Distance travelled ÷ fuel average) × fuel price per litre</p>
                                 </div>
 
                                 <div class="border-t border-dark-700 pt-6">
-                                    <div class="flex items-baseline justify-between gap-4">
-                                        <label class="text-sm font-medium text-gray-200">Who was the driver?</label>
-                                        <span class="text-xs text-gray-500">Choose one</span>
-                                    </div>
-                                    <div class="mt-3 flex flex-wrap gap-2">
-                                        @foreach ($drivers as $driver)
-                                            <button type="button" @click="driver = '{{ $driver }}'"
-                                                :class="driver === '{{ $driver }}' ? 'border-primary bg-primary/15 text-primary-light' : 'border-dark-600 bg-dark-900 text-gray-400 hover:border-primary/50 hover:text-gray-200'"
-                                                class="rounded-full border px-4 py-2 text-sm font-medium transition-colors">
-                                                {{ $driver }}
-                                            </button>
-                                        @endforeach
-                                    </div>
+                                    <x-admin.indus-gas.expenses.tag-picker group="people" selection="driver" items="people" label="Who was the driver?" help="Choose one" />
                                 </div>
 
                                 <div class="border-t border-dark-700 pt-6">
@@ -521,6 +408,7 @@
                                 <div class="flex items-center justify-end border-t border-dark-700 pt-6">
                                     <button type="button" disabled class="cursor-not-allowed rounded-lg bg-dark-700 px-5 py-2.5 text-sm font-medium text-gray-500">Save {{ strtolower($tab) }} fuel expense (coming soon)</button>
                                 </div>
+                                <x-admin.indus-gas.expenses.tag-manager-modal />
                             </form>
                         @else
                             <div class="flex min-h-52 flex-col items-center justify-center text-center">
@@ -538,4 +426,72 @@
             </div>
         </div>
     </div>
+
+    <script>
+        window.expenseForm = (config = {}) => ({
+            expenseType: '',
+            expenseTypes: [],
+            people: [],
+            payers: [],
+            amounts: {},
+            driver: '',
+            tagModal: { open: false, group: '', id: null, name: '', error: '' },
+            ...config,
+            toggleTag(selection, multiple, id) {
+                if (multiple) {
+                    this[selection] = this[selection].includes(id)
+                        ? this[selection].filter(selectedId => selectedId !== id)
+                        : [...this[selection], id];
+                    return;
+                }
+
+                this[selection] = id;
+            },
+            isTagSelected(selection, multiple, id) {
+                return multiple ? this[selection].includes(id) : this[selection] === id;
+            },
+            openTagModal(group, tag = null) {
+                this.tagModal = { open: true, group, id: tag?.id ?? null, name: tag?.name ?? '', error: '' };
+                this.$nextTick(() => this.$refs.tagName?.focus());
+            },
+            closeTagModal() {
+                this.tagModal.open = false;
+            },
+            saveTag() {
+                const name = this.tagModal.name.trim();
+                const items = this[this.tagModal.group];
+
+                if (!name) {
+                    this.tagModal.error = 'Please enter a tag name.';
+                    return;
+                }
+
+                if (items.some(tag => tag.name.toLowerCase() === name.toLowerCase() && tag.id !== this.tagModal.id)) {
+                    this.tagModal.error = 'This tag already exists.';
+                    return;
+                }
+
+                if (this.tagModal.id) {
+                    const tag = items.find(item => item.id === this.tagModal.id);
+                    tag.name = name;
+                } else {
+                    items.push({ id: `tag-${Date.now()}`, name });
+                }
+
+                this.closeTagModal();
+            },
+            removeTag(group, id) {
+                const tag = this[group].find(item => item.id === id);
+                if (!tag || !window.confirm(`Remove “${tag.name}”?`)) return;
+
+                this[group] = this[group].filter(item => item.id !== id);
+                if (group === 'expenseTypes' && this.expenseType === id) this.expenseType = '';
+                if (group === 'people') {
+                    this.payers = this.payers.filter(payerId => payerId !== id);
+                    if (this.driver === id) this.driver = '';
+                    delete this.amounts[id];
+                }
+            },
+        });
+    </script>
 </x-layouts.admin>
