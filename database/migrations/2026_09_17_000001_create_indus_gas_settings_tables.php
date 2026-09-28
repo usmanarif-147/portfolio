@@ -54,7 +54,10 @@ return new class extends Migration
         Schema::create('indus_gas_expense_categories', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
+            $table->string('slug')->unique();
             $table->text('description')->nullable();
+            $table->string('expense_type_display', 20)->default('tags');
+            $table->string('staff_display', 20)->default('tags');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

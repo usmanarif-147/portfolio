@@ -10,7 +10,6 @@
             ['route' => 'admin.indus-gas.settings.suppliers', 'title' => 'Suppliers', 'description' => 'BBN Plant, FAS Tube, and future suppliers.', 'status' => $supplierCount.' added'],
             ['route' => 'admin.indus-gas.settings.cylinder-types', 'title' => 'Cylinder Types', 'description' => 'Commercial and domestic cylinder capacities.', 'status' => $cylinderTypeCount.' added'],
             ['route' => 'admin.indus-gas.settings.vehicles', 'title' => 'Vehicles', 'description' => 'Pickup and future delivery vehicles.', 'status' => $vehicleCount.' added'],
-            ['route' => 'admin.indus-gas.settings.expense-categories', 'title' => 'Expense Categories', 'description' => 'Categories used when recording expenses.', 'status' => $expenseCategoryCount.' added'],
         ] as $item)
             <a href="{{ route($item['route']) }}" wire:navigate class="block bg-dark-800 border border-dark-700 hover:border-primary/60 rounded-xl p-6 transition-colors">
                 <div class="flex items-start justify-between gap-4"><h2 class="text-lg font-mono font-semibold text-white">{{ $item['title'] }}</h2><span class="text-xs rounded-full bg-primary/10 text-primary-light px-2.5 py-1 whitespace-nowrap">{{ $item['status'] }}</span></div>

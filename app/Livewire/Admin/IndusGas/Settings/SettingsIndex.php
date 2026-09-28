@@ -4,7 +4,6 @@ namespace App\Livewire\Admin\IndusGas\Settings;
 
 use App\Models\IndusGas\BusinessProfile;
 use App\Models\IndusGas\CylinderType;
-use App\Models\IndusGas\ExpenseCategory;
 use App\Models\IndusGas\Supplier;
 use App\Models\IndusGas\Vehicle;
 use Livewire\Attributes\Layout;
@@ -20,7 +19,6 @@ class SettingsIndex extends Component
             'supplierCount' => Supplier::query()->count(),
             'cylinderTypeCount' => CylinderType::query()->count(),
             'vehicleCount' => Vehicle::query()->count(),
-            'expenseCategoryCount' => ExpenseCategory::query()->count(),
         ]);
     }
 }

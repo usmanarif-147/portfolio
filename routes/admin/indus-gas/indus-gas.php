@@ -8,8 +8,6 @@ use App\Livewire\Admin\IndusGas\Billing\BillingIndex;
 use App\Livewire\Admin\IndusGas\Billing\LedgerShow;
 use App\Livewire\Admin\IndusGas\Billing\PaymentForm;
 use App\Http\Controllers\Admin\IndusGas\ExpensesController;
-use App\Http\Controllers\Admin\IndusGas\ExpensesV1Controller;
-use App\Http\Controllers\Admin\IndusGas\ExpensesV2Controller;
 use App\Livewire\Admin\IndusGas\Reports\ReportIndex;
 use App\Http\Controllers\IndusGasPdfController;
 use App\Livewire\Admin\IndusGas\Operations\DeliveryForm;
@@ -19,13 +17,13 @@ use App\Livewire\Admin\IndusGas\Operations\StockIndex;
 use App\Livewire\Admin\IndusGas\Settings\BusinessProfileForm;
 use App\Livewire\Admin\IndusGas\Settings\CylinderTypeForm;
 use App\Livewire\Admin\IndusGas\Settings\CylinderTypeIndex;
-use App\Livewire\Admin\IndusGas\Settings\ExpenseCategoryForm;
-use App\Livewire\Admin\IndusGas\Settings\ExpenseCategoryIndex;
 use App\Livewire\Admin\IndusGas\Settings\SettingsIndex;
 use App\Livewire\Admin\IndusGas\Settings\SupplierForm;
 use App\Livewire\Admin\IndusGas\Settings\SupplierIndex;
 use App\Livewire\Admin\IndusGas\Settings\VehicleForm;
 use App\Livewire\Admin\IndusGas\Settings\VehicleIndex;
+use App\Livewire\Admin\IndusGas\Staff\StaffForm;
+use App\Livewire\Admin\IndusGas\Staff\StaffIndex;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/indus-gas/dashboard', ComingSoon::class)
@@ -49,9 +47,9 @@ Route::get('/indus-gas/invoices/{invoice}/pdf', [IndusGasPdfController::class, '
 Route::get('/indus-gas/customers/{customer}/ledger-pdf', [IndusGasPdfController::class, 'ledger'])->name('admin.indus-gas.ledgers.pdf');
 
 Route::get('/indus-gas/expenses', ExpensesController::class)->name('admin.indus-gas.expenses');
-
-Route::get('/indus-gas/expenses-v1', ExpensesV1Controller::class)->name('admin.indus-gas.expenses-v1');
-Route::get('/indus-gas/expenses-v2', ExpensesV2Controller::class)->name('admin.indus-gas.expenses-v2');
+Route::get('/indus-gas/staff', StaffIndex::class)->name('admin.indus-gas.staff');
+Route::get('/indus-gas/staff/create', StaffForm::class)->name('admin.indus-gas.staff.create');
+Route::get('/indus-gas/staff/{staff}/edit', StaffForm::class)->name('admin.indus-gas.staff.edit');
 
 Route::get('/indus-gas/reports', ReportIndex::class)->name('admin.indus-gas.reports');
 
@@ -75,7 +73,4 @@ Route::prefix('/indus-gas/settings')->name('admin.indus-gas.settings.')->group(f
     Route::get('/vehicles/create', VehicleForm::class)->name('vehicles.create');
     Route::get('/vehicles/{vehicle}/edit', VehicleForm::class)->name('vehicles.edit');
 
-    Route::get('/expense-categories', ExpenseCategoryIndex::class)->name('expense-categories');
-    Route::get('/expense-categories/create', ExpenseCategoryForm::class)->name('expense-categories.create');
-    Route::get('/expense-categories/{expenseCategory}/edit', ExpenseCategoryForm::class)->name('expense-categories.edit');
 });

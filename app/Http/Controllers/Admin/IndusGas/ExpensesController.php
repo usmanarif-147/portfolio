@@ -9,6 +9,6 @@ class ExpensesController extends Controller
 {
     public function __invoke(): View
     {
-        return view('admin.indus-gas.expenses.coming-soon');
+        return view('admin.indus-gas.expenses.index');
     }
 }
