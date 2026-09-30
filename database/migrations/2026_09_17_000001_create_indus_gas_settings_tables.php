@@ -56,10 +56,7 @@ return new class extends Migration
             $table->string('name')->unique();
             $table->string('slug')->unique();
             $table->text('description')->nullable();
-            $table->string('expense_type_display', 20)->default('tags');
-            $table->string('staff_display', 20)->default('tags');
-            $table->string('staff_selection_mode', 30)->default('multiple_payers');
-            $table->boolean('requires_cylinder_quantity')->default(false);
+            $table->json('form_fields')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

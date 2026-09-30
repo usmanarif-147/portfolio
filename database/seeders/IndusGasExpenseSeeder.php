@@ -1,0 +1,4 @@
+<?php
+namespace Database\Seeders;
+use App\Models\IndusGas\ExpenseCategory; use Illuminate\Database\Seeder;
+class IndusGasExpenseSeeder extends Seeder { public function run():void{foreach(['bike'=>'Bike','car'=>'Car'] as $slug=>$name){$c=ExpenseCategory::firstOrCreate(['slug'=>$slug],['name'=>$name,'form_fields'=>[['key'=>'distance_travelled','type'=>'number','label'=>'Distance travelled (km)','placeholder'=>'For example: 10','required'=>true],['key'=>'fuel_average','type'=>'decimal','label'=>'Fuel average (km/litre)','placeholder'=>'For example: 8','required'=>true],['key'=>'fuel_rate','type'=>'decimal','label'=>'Fuel price per litre (PKR)','placeholder'=>'For example: 395.56','required'=>true]],'is_active'=>true]);$c->types()->firstOrCreate(['slug'=>'fuel_cost'],['name'=>'Fuel Cost','is_active'=>true]);}}}

@@ -13,12 +13,8 @@ return new class extends Migration {
             $table->foreignId('expense_type_id')->nullable()->constrained('indus_gas_expense_types')->nullOnDelete();
             $table->date('expense_date');
             $table->decimal('amount', 14, 2)->default(0);
-            $table->unsignedInteger('cylinder_quantity')->nullable();
-            $table->decimal('distance_km', 10, 2)->nullable();
-            $table->decimal('fuel_average_km_per_litre', 10, 2)->nullable();
-            $table->decimal('fuel_rate_per_litre', 10, 2)->nullable();
-            $table->string('driver', 100)->nullable();
             $table->json('payer_amounts')->nullable();
+            $table->json('form_data')->nullable();
             $table->timestamps();
             $table->index('expense_date');
         });
