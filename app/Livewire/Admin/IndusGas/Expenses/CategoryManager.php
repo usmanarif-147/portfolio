@@ -3,7 +3,8 @@ namespace App\Livewire\Admin\IndusGas\Expenses;
 use App\Models\IndusGas\ExpenseCategory; use App\Models\IndusGas\Staff; use Illuminate\Support\Str; use Illuminate\Validation\Rule; use Livewire\Attributes\On; use Livewire\Component;
 class CategoryManager extends Component {
  public bool $open=false,$is_active=true; public ?int $categoryId=null; public string $name=''; public array $expenseTypes=[''],$staffIds=[],$formFields=[];
- #[On('open-expense-category-manager')] public function create():void{$this->reset(['categoryId','name','staffIds']);$this->expenseTypes=[''];$this->formFields=[];$this->is_active=true;$this->open=true;}
+ #[On('open-expense-category-manager')] public function openManager(?int $categoryId=null):void{$categoryId?$this->edit($categoryId):$this->create();}
+ public function create():void{$this->reset(['categoryId','name','staffIds']);$this->expenseTypes=[''];$this->formFields=[];$this->is_active=true;$this->open=true;}
  public function edit(int $id):void{$c=ExpenseCategory::with(['types','staff'])->findOrFail($id);$this->categoryId=$id;$this->name=$c->name;$this->expenseTypes=$c->types->pluck('name')->all()?:[''];$this->staffIds=$c->staff->pluck('id')->all();$this->formFields=$c->form_fields??[];$this->is_active=$c->is_active;$this->open=true;}
  public function addType():void{$this->expenseTypes[]='';} public function removeType($i=null):void{if($i!==null&&array_key_exists((int)$i,$this->expenseTypes)){unset($this->expenseTypes[(int)$i]);$this->expenseTypes=array_values($this->expenseTypes)?:[''];}}
  public function addField():void{$this->formFields[]=['type'=>'text','label'=>'','placeholder'=>'','required'=>false];} public function removeField($i=null):void{if($i!==null&&array_key_exists((int)$i,$this->formFields)){unset($this->formFields[(int)$i]);$this->formFields=array_values($this->formFields);}}
