@@ -1,12 +1,123 @@
 <?php
+
 namespace App\Livewire\Admin\IndusGas\Expenses;
-use App\Models\IndusGas\Expense; use App\Models\IndusGas\ExpenseCategory; use App\Models\IndusGas\Staff; use Livewire\Attributes\On; use Livewire\Component;
-class ExpenseIndex extends Component { public bool $showForm=false; public ?string $notice=null; public ?int $expenseCategoryId=null,$expenseTypeId=null,$responsibleStaffId=null; public string $expenseDate=''; public array $selectedStaffIds=[],$payerAmounts=[],$formData=[];
- public function mount():void{$this->expenseDate=now('Asia/Karachi')->toDateString();} public function openForm():void{$this->reset(['expenseCategoryId','expenseTypeId','responsibleStaffId','selectedStaffIds','payerAmounts','formData']);$this->expenseDate=now('Asia/Karachi')->toDateString();$this->showForm=true;} public function closeForm():void{$this->showForm=false;$this->resetValidation();}
- public function selectCategory(int $id):void{$c=ExpenseCategory::with('types')->where('is_active',true)->findOrFail($id);$this->expenseCategoryId=$id;$this->expenseTypeId=$c->types->first()?->id;$this->selectedStaffIds=[];$this->payerAmounts=[];$this->responsibleStaffId=null;$this->formData=[];$this->resetValidation();}
- public function togglePayer(int $id):void{if(in_array($id,$this->selectedStaffIds,true)){$this->selectedStaffIds=array_values(array_filter($this->selectedStaffIds,fn($v)=>$v!==$id));unset($this->payerAmounts[$id]);}else{$this->selectedStaffIds[]=$id;$this->payerAmounts[$id]='';}}
- public function openCategoryManager(?int $categoryId=null):void{$this->dispatch('open-expense-category-manager', categoryId: $categoryId);} #[On('expense-categories-updated')] public function refreshCategories(?string $message=null):void{$this->notice=$message??'Category saved successfully.';}
- public function save():void{$c=ExpenseCategory::with(['types','staff'])->where('is_active',true)->find($this->expenseCategoryId);if(!$c){$this->addError('expenseCategoryId','Select a category.');return;}$driver=in_array($c->slug,['bike','car'],true);$staff=$driver?Staff::orderBy('name')->get():$c->staff;$allowed=$staff->pluck('id')->map(fn($v)=>(int)$v)->all();$this->validate(['expenseDate'=>'required|date','expenseTypeId'=>'required|integer']);if(!$c->types->pluck('id')->contains($this->expenseTypeId)){$this->addError('expenseTypeId','Select a valid expense type.');return;}$data=[];foreach($c->form_fields??[] as $field){$key=$field['key'];$value=$this->formData[$key]??null;if($field['required']&&($value===null||$value==='')){$this->addError("formData.$key",$field['label'].' is required.');return;}if($value!==null&&$value!==''&&in_array($field['type'],['number','decimal'],true)&&!is_numeric($value)){$this->addError("formData.$key",$field['label'].' must be a number.');return;}$data[$key]=$value;}if($driver){if(!$this->responsibleStaffId||!in_array($this->responsibleStaffId,$allowed,true)){$this->addError('responsibleStaffId','Select a driver.');return;}$amount=$this->fuelCost($data);}else{if(!$this->selectedStaffIds){$this->addError('selectedStaffIds','Select at least one person who paid.');return;}foreach($this->selectedStaffIds as $id){if(!in_array((int)$id,$allowed,true)||!isset($this->payerAmounts[$id])||!is_numeric($this->payerAmounts[$id])){$this->addError('payerAmounts','Enter valid amounts for selected staff.');return;}}$amount=array_sum(array_map('floatval',$this->payerAmounts));}$e=Expense::create(['expense_category_id'=>$c->id,'expense_type_id'=>$this->expenseTypeId,'responsible_staff_id'=>$driver?$this->responsibleStaffId:null,'expense_date'=>$this->expenseDate,'amount'=>$amount,'payer_amounts'=>$driver?null:$this->payerAmounts,'form_data'=>$data]);$this->showForm=false;session()->flash('success','Expense saved successfully.');}
- private function fuelCost(array $d):float{$values=array_values($d);return count($values)>=3&&is_numeric($values[0])&&is_numeric($values[1])&&is_numeric($values[2])&&$values[1]>0?((float)$values[0]/(float)$values[1])*(float)$values[2]:0;}
- public function render(){return view('livewire.admin.indus-gas.expenses.expense-index',['categories'=>ExpenseCategory::with(['types','staff'])->where('is_active',true)->orderBy('name')->get(),'selectedCategory'=>$this->expenseCategoryId?ExpenseCategory::with(['types','staff'])->find($this->expenseCategoryId):null,'dailyExpenses'=>Expense::query()->selectRaw('expense_date, SUM(amount) as total_amount, COUNT(*) as expense_count')->groupBy('expense_date')->orderByDesc('expense_date')->get()]);}
+
+use App\Models\IndusGas\Expense;
+use App\Models\IndusGas\ExpenseCategory;
+use App\Models\IndusGas\Staff;
+use Livewire\Attributes\On;
+use Livewire\Component;
+
+class ExpenseIndex extends Component
+{
+    public bool $showForm = false;
+    public ?string $notice = null;
+    public ?int $expenseCategoryId = null, $expenseTypeId = null, $responsibleStaffId = null;
+    public string $expenseDate = '';
+    public array $selectedStaffIds = [], $payerAmounts = [], $formData = [];
+    public function mount(): void
+    {
+        $this->expenseDate = now('Asia/Karachi')->toDateString();
+    }
+    public function openForm(): void
+    {
+        $this->reset(['expenseCategoryId', 'expenseTypeId', 'responsibleStaffId', 'selectedStaffIds', 'payerAmounts', 'formData']);
+        $this->expenseDate = now('Asia/Karachi')->toDateString();
+        $this->showForm = true;
+    }
+    public function closeForm(): void
+    {
+        $this->showForm = false;
+        $this->resetValidation();
+    }
+    public function selectCategory(int $id): void
+    {
+        $c = ExpenseCategory::with('types')->where('is_active', true)->findOrFail($id);
+        $this->expenseCategoryId = $id;
+        $this->expenseTypeId = $c->types->first()?->id;
+        $this->selectedStaffIds = [];
+        $this->payerAmounts = [];
+        $this->responsibleStaffId = null;
+        $this->formData = [];
+        $this->resetValidation();
+    }
+    public function togglePayer(int $id): void
+    {
+        if (in_array($id, $this->selectedStaffIds, true)) {
+            $this->selectedStaffIds = array_values(array_filter($this->selectedStaffIds, fn($v) => $v !== $id));
+            unset($this->payerAmounts[$id]);
+        } else {
+            $this->selectedStaffIds[] = $id;
+            $this->payerAmounts[$id] = '';
+        }
+    }
+    public function openCategoryManager(?int $categoryId = null): void
+    {
+        $this->dispatch('open-expense-category-manager', categoryId: $categoryId);
+    }
+    #[On('expense-categories-updated')] public function refreshCategories(?string $message = null): void
+    {
+        $this->notice = $message ?? 'Category saved successfully.';
+    }
+    public function save(): void
+    {
+        $c = ExpenseCategory::with(['types', 'staff'])->where('is_active', true)->find($this->expenseCategoryId);
+        if (!$c) {
+            $this->addError('expenseCategoryId', 'Select a category.');
+            return;
+        }
+        $driver = in_array($c->slug, ['bike', 'car'], true);
+        $staff = $driver ? Staff::orderBy('name')->get() : $c->staff;
+        $allowed = $staff->pluck('id')->map(fn($v) => (int)$v)->all();
+        $this->validate(['expenseDate' => 'required|date', 'expenseTypeId' => 'required|integer']);
+        if (!$c->types->pluck('id')->contains($this->expenseTypeId)) {
+            $this->addError('expenseTypeId', 'Select a valid expense type.');
+            return;
+        }
+        $data = [];
+        foreach ($c->form_fields ?? [] as $field) {
+            $key = $field['key'];
+            $value = $this->formData[$key] ?? null;
+            if ($field['required'] && ($value === null || $value === '')) {
+                $this->addError("formData.$key", $field['label'] . ' is required.');
+                return;
+            }
+            if ($value !== null && $value !== '' && in_array($field['type'], ['number', 'decimal'], true) && !is_numeric($value)) {
+                $this->addError("formData.$key", $field['label'] . ' must be a number.');
+                return;
+            }
+            $data[$key] = $value;
+        }
+        if ($driver) {
+            if (!$this->responsibleStaffId || !in_array($this->responsibleStaffId, $allowed, true)) {
+                $this->addError('responsibleStaffId', 'Select a driver.');
+                return;
+            }
+            $amount = $this->fuelCost($data);
+        } else {
+            if (!$this->selectedStaffIds) {
+                $this->addError('selectedStaffIds', 'Select at least one person who paid.');
+                return;
+            }
+            foreach ($this->selectedStaffIds as $id) {
+                if (!in_array((int)$id, $allowed, true) || !isset($this->payerAmounts[$id]) || !is_numeric($this->payerAmounts[$id])) {
+                    $this->addError('payerAmounts', 'Enter valid amounts for selected staff.');
+                    return;
+                }
+            }
+            $amount = array_sum(array_map('floatval', $this->payerAmounts));
+        }
+        $e = Expense::create(['expense_category_id' => $c->id, 'expense_type_id' => $this->expenseTypeId, 'responsible_staff_id' => $driver ? $this->responsibleStaffId : null, 'expense_date' => $this->expenseDate, 'amount' => $amount, 'payer_amounts' => $driver ? null : $this->payerAmounts, 'form_data' => $data]);
+        $this->showForm = false;
+        session()->flash('success', 'Expense saved successfully.');
+    }
+    private function fuelCost(array $d): float
+    {
+        $values = array_values($d);
+        return count($values) >= 3 && is_numeric($values[0]) && is_numeric($values[1]) && is_numeric($values[2]) && $values[1] > 0 ? ((float)$values[0] / (float)$values[1]) * (float)$values[2] : 0;
+    }
+    public function render()
+    {
+        return view('livewire.admin.indus-gas.expenses.expense-index', ['categories' => ExpenseCategory::with(['types', 'staff'])->where('is_active', true)->orderBy('name')->get(), 'selectedCategory' => $this->expenseCategoryId ? ExpenseCategory::with(['types', 'staff'])->find($this->expenseCategoryId) : null, 'dailyExpenses' => Expense::query()->selectRaw('MIN(id) as expense_id, DATE(expense_date) as expense_date, SUM(amount) as total_amount, COUNT(*) as expense_count')->groupByRaw('DATE(expense_date)')->orderByDesc('expense_date')->get()]);
+    }
 }

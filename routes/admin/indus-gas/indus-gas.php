@@ -25,6 +25,7 @@ use App\Livewire\Admin\IndusGas\Settings\VehicleIndex;
 use App\Livewire\Admin\IndusGas\Staff\StaffForm;
 use App\Livewire\Admin\IndusGas\Staff\StaffIndex;
 use App\Livewire\Admin\IndusGas\Expenses\ExpenseDayDetails;
+use App\Livewire\Admin\IndusGas\Expenses\ExpensePayerBoard;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/indus-gas/dashboard', ComingSoon::class)
@@ -48,7 +49,8 @@ Route::get('/indus-gas/invoices/{invoice}/pdf', [IndusGasPdfController::class, '
 Route::get('/indus-gas/customers/{customer}/ledger-pdf', [IndusGasPdfController::class, 'ledger'])->name('admin.indus-gas.ledgers.pdf');
 
 Route::get('/indus-gas/expenses', ExpensesController::class)->name('admin.indus-gas.expenses');
-Route::get('/indus-gas/expenses/{date}', ExpenseDayDetails::class)->where('date', '\\d{4}-\\d{2}-\\d{2}')->name('admin.indus-gas.expenses.day');
+Route::get('/indus-gas/expenses/{expense}/payers', ExpensePayerBoard::class)->whereNumber('expense')->name('admin.indus-gas.expenses.payers');
+Route::get('/indus-gas/expenses/{expense}', ExpenseDayDetails::class)->whereNumber('expense')->name('admin.indus-gas.expenses.day');
 Route::get('/indus-gas/staff', StaffIndex::class)->name('admin.indus-gas.staff');
 Route::get('/indus-gas/staff/create', StaffForm::class)->name('admin.indus-gas.staff.create');
 Route::get('/indus-gas/staff/{staff}/edit', StaffForm::class)->name('admin.indus-gas.staff.edit');
