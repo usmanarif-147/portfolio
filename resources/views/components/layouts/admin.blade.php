@@ -97,6 +97,7 @@
                         'admin.indus-gas.dashboard' => 'Dashboard',
                         'admin.indus-gas.customers' => 'Customers',
                         'admin.indus-gas.daily-operations' => 'Daily Operations',
+                        'admin.indus-gas.lpg-plant' => 'LPG Plant',
                         'admin.indus-gas.payments-ledgers' => 'Payments & Ledgers',
                         'admin.indus-gas.expenses' => 'Expenses',
                         'admin.indus-gas.staff' => 'Staff',
@@ -104,8 +105,13 @@
                         'admin.indus-gas.documents' => 'Documents',
                         'admin.indus-gas.settings.index' => 'Settings',
                     ] as $route => $label)
+                        @php
+                            $isCurrent = request()->routeIs($route)
+                                || ($route === 'admin.indus-gas.settings.index' && request()->routeIs('admin.indus-gas.settings.*'))
+                                || ($route === 'admin.indus-gas.lpg-plant' && request()->routeIs('admin.indus-gas.lpg-plant.*'));
+                        @endphp
                         <a href="{{ route($route) }}" wire:navigate
-                            class="flex items-center gap-3 pl-10 pr-3 py-2 rounded-lg text-sm font-medium {{ request()->routeIs($route) || ($route === 'admin.indus-gas.settings.index' && request()->routeIs('admin.indus-gas.settings.*')) ? 'bg-primary/10 text-primary-light' : 'text-gray-400 hover:text-white hover:bg-dark-700' }} transition-colors">
+                            class="flex items-center gap-3 pl-10 pr-3 py-2 rounded-lg text-sm font-medium {{ $isCurrent ? 'bg-primary/10 text-primary-light' : 'text-gray-400 hover:text-white hover:bg-dark-700' }} transition-colors">
                             {{ $label }}
                         </a>
                     @endforeach

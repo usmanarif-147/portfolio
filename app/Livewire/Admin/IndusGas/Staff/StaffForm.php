@@ -11,6 +11,7 @@ class StaffForm extends Component
 {
     public ?Staff $staff = null;
     public string $name = '';
+    public string $role = 'employee';
     public string $designation = '';
     public ?string $joining_date = null;
     public ?string $leaving_date = null;
@@ -21,6 +22,7 @@ class StaffForm extends Component
         $this->staff = $staff;
         if ($staff) {
             $this->name = $staff->name;
+            $this->role = $staff->role;
             $this->designation = $staff->designation;
             $this->joining_date = $staff->joining_date?->toDateString();
             $this->leaving_date = $staff->leaving_date?->toDateString();
@@ -32,6 +34,7 @@ class StaffForm extends Component
     {
         $data = $this->validate([
             'name' => ['required', 'string', 'max:150'],
+            'role' => ['required', 'in:owner,partner,employee'],
             'designation' => ['required', 'string', 'max:150'],
             'joining_date' => ['nullable', 'date'],
             'leaving_date' => ['nullable', 'date', 'after_or_equal:joining_date'],

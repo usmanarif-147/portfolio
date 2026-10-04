@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::create('indus_gas_staff', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('role', 20)->default('employee')->index();
             $table->string('designation');
             $table->date('joining_date')->nullable();
             $table->date('leaving_date')->nullable();

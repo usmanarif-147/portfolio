@@ -9,7 +9,7 @@ class Staff extends Model
 {
     protected $table = 'indus_gas_staff';
 
-    protected $fillable = ['name', 'designation', 'joining_date', 'leaving_date', 'salary_package'];
+    protected $fillable = ['name', 'role', 'designation', 'joining_date', 'leaving_date', 'salary_package'];
 
     protected function casts(): array
     {

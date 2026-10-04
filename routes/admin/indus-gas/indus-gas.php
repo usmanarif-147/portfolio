@@ -26,6 +26,9 @@ use App\Livewire\Admin\IndusGas\Staff\StaffForm;
 use App\Livewire\Admin\IndusGas\Staff\StaffIndex;
 use App\Livewire\Admin\IndusGas\Expenses\ExpenseDayDetails;
 use App\Livewire\Admin\IndusGas\Expenses\ExpensePayerBoard;
+use App\Livewire\Admin\IndusGas\LpgPlant\LpgPlantForm;
+use App\Livewire\Admin\IndusGas\LpgPlant\LpgPlantIndex;
+use App\Http\Controllers\IndusGasLpgPlantPdfController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/indus-gas/dashboard', ComingSoon::class)
@@ -41,6 +44,11 @@ Route::get('/indus-gas/daily-operations', OperationsIndex::class)->name('admin.i
 Route::get('/indus-gas/daily-operations/refills/create', RefillForm::class)->name('admin.indus-gas.refills.create');
 Route::get('/indus-gas/daily-operations/deliveries/create', DeliveryForm::class)->name('admin.indus-gas.deliveries.create');
 Route::get('/indus-gas/daily-operations/stock', StockIndex::class)->name('admin.indus-gas.stock');
+
+Route::get('/indus-gas/lpg-plant', LpgPlantIndex::class)->name('admin.indus-gas.lpg-plant');
+Route::get('/indus-gas/lpg-plant/create', LpgPlantForm::class)->name('admin.indus-gas.lpg-plant.create');
+Route::get('/indus-gas/lpg-plant/{entry}/edit', LpgPlantForm::class)->name('admin.indus-gas.lpg-plant.edit');
+Route::get('/indus-gas/lpg-plant-rate-report', IndusGasLpgPlantPdfController::class)->name('admin.indus-gas.lpg-plant.report');
 
 Route::get('/indus-gas/payments-ledgers', BillingIndex::class)->name('admin.indus-gas.payments-ledgers');
 Route::get('/indus-gas/payments-ledgers/payments/create', PaymentForm::class)->name('admin.indus-gas.payments.create');
