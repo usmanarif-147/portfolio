@@ -46,7 +46,6 @@ Route::get('/indus-gas/daily-operations/deliveries/create', DeliveryForm::class)
 Route::get('/indus-gas/daily-operations/stock', StockIndex::class)->name('admin.indus-gas.stock');
 
 Route::get('/indus-gas/lpg-plant', LpgPlantIndex::class)->name('admin.indus-gas.lpg-plant');
-Route::get('/indus-gas/lpg-plant/create', LpgPlantForm::class)->name('admin.indus-gas.lpg-plant.create');
 Route::get('/indus-gas/lpg-plant/{entry}/edit', LpgPlantForm::class)->name('admin.indus-gas.lpg-plant.edit');
 Route::get('/indus-gas/lpg-plant-rate-report', IndusGasLpgPlantPdfController::class)->name('admin.indus-gas.lpg-plant.report');
 
